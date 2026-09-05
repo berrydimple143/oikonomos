@@ -1,0 +1,19 @@
+{
+    "name": "hp/oikonomos",
+    "description": "This is a financial system for churches",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Hp\\Oikonomos\\": "src/"
+        },
+        "files": [
+            "src/Functions/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Virgil Rosalita"
+        }
+    ],
+    "require": {}
+}
