@@ -28,14 +28,16 @@
 		$data['received_from'] = $input->received_from;
 		$data['date_received'] = $input->date_received;
 		$data['description'] = $input->description;
+		$data['year'] = $input->year;
+		$data['month'] = $input->month;
 
 		$controller = new IncomeController();
         if($mode == 'add' || $mode == 'edit') {
             $info = $controller->store($data);
 		} elseif($mode == 'getAll') {
-			$info = $controller->getIncomes($input->user_id);
+			$info = $controller->getIncomes($input->user_id, $input->year, $input->month);
 		} elseif($mode == 'delete') {
-			$info = $controller->deleteData($input->id, $input->user_id);
+			$info = $controller->deleteData($input->id, $input->user_id, $input->year, $input->month);
 		} elseif($mode == 'search') {
 			$info = $controller->getData($input->id);
 		} elseif($mode == 'change') {

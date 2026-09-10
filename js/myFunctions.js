@@ -23,7 +23,7 @@ window.currencyFormatterWithChecking = function(value, curr, label) {
 window.dateTimeNowFormatter = function(tp) {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');    
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -47,3 +47,57 @@ window.dateTimeNowFormatter = function(tp) {
         return `${seconds}`;
     }    
 };
+
+window.getCurrentDate = function(dt) {
+    const cd = new Date();
+    if(dt == 'y') {
+        return cd.getFullYear(); // returns e.g. 2026
+    } else if(dt == 'm') {
+        return cd.getMonth() + 1; // returns 0 - 11
+    } else if(dt == 'd') {
+        return cd.getDate(); // returns between 1 and 31
+    } else if(dt == 'h') {
+        return cd.getHours(); // returns 0 - 23
+    } else if(dt == 'i') {
+        return cd.getMinutes(); // returns 0 - 59
+    } else if(dt == 's') {
+        return cd.getSeconds(); // returns 0 - 59
+    }
+};
+
+window.initYearSelection = function(arr, from, to) {
+    for(let i = to; i >= from; i--) {
+        arr.push(i);
+    }   
+    return arr;
+}
+
+window.getFullDateByYearMonth = function(year, month) {
+    if(month == "Jan" || month == "January") {
+        return `${year}-01-01 08:00:00`;
+    } else if(month == "Feb" || month == "February") {
+        return `${year}-02-01 08:00:00`;
+    } else if(month == "Mar" || month == "March") {
+        return `${year}-03-01 08:00:00`;
+    } else if(month == "Apr" || month == "April") {
+        return `${year}-04-01 08:00:00`;
+    } else if(month == "May" || month == "May") {
+        return `${year}-05-01 08:00:00`;
+    } else if(month == "Jun" || month == "June") {
+        return `${year}-06-01 08:00:00`;
+    } else if(month == "Jul" || month == "July") {
+        return `${year}-07-01 08:00:00`;
+    } else if(month == "Aug" || month == "August") {
+        return `${year}-08-01 08:00:00`;
+    } else if(month == "Sep" || month == "September") {
+        return `${year}-09-01 08:00:00`;
+    } else if(month == "Oct" || month == "October") {
+        return `${year}-10-01 08:00:00`;
+    } else if(month == "Nov" || month == "November") {
+        return `${year}-11-01 08:00:00`;
+    } else if(month == "Dec" || month == "December") {
+        return `${year}-12-01 08:00:00`;
+    } else {
+        return dateTimeNowFormatter('datetime', false, false);
+    }
+}

@@ -10,8 +10,8 @@ document.addEventListener('alpine:init', () => {
         scrollTop: false,        
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         income: [0,0,0,0,0,0,0,0,0,0,0,0],
-        expense: [40, 10, 43, 18, 16, 30, 33, 27, 43, 36, 21, 48],
-        attendance: [30, 30, 30, 25, 20, 25, 25, 40, 32, 34, 25, 28],
+        expense: [0,0,0,0,0,0,0,0,0,0,0,0],
+        attendance: [0,0,0,0,0,0,0,0,0,0,0,0],
         redirectUrl: '../login.php',        
         currentYear: null,
         user_id: null,
@@ -19,6 +19,7 @@ document.addEventListener('alpine:init', () => {
         user_firstname: null,
         user_lastname: null,
         user_organization: null,        
+        // Income
         incomes: [],        
         date_received: dateTimeNowFormatter('datetime'),        
         received_on: dateTimeNowFormatter('datetime'),
@@ -32,6 +33,7 @@ document.addEventListener('alpine:init', () => {
         viewIncomeModal: null,
         incomeAPI: '../api/admin/income.php',
         incomeCounterAPI: '../api/admin/countIncome.php',
+        incomeTotal: 0,
         currentPage: 1,
         searchQuery: '',
         pageSize: 7,
@@ -46,7 +48,8 @@ document.addEventListener('alpine:init', () => {
         expensed_on: dateTimeNowFormatter('datetime'),
         date_expensed: dateTimeNowFormatter('datetime'),
         expenseAPI: '../api/admin/expense.php',
-        expenseCounterAPI: '../api/admin/countExpense.php',        
+        expenseCounterAPI: '../api/admin/countExpense.php',      
+        expenseTotal: 0,  
         expenses: [],
         expenseId: null,
         expenseNumber: 0,
@@ -62,6 +65,30 @@ document.addEventListener('alpine:init', () => {
         visibleLabels: [],
         chartDataAPI: '../api/admin/chart.php',
         maxValue: 0,
+        graphSelection: [
+                { abbr: 'Jan', month: 'January' },
+                { abbr: 'Feb', month: 'February' },
+                { abbr: 'Mar', month: 'March' },
+                { abbr: 'Apr', month: 'April' },
+                { abbr: 'May', month: 'May' },
+                { abbr: 'Jun', month: 'June' },
+                { abbr: 'Jul', month: 'July' },
+                { abbr: 'Aug', month: 'August' },
+                { abbr: 'Sep', month: 'September' },
+                { abbr: 'Oct', month: 'October' },
+                { abbr: 'Nov', month: 'November' },
+                { abbr: 'Dec', month: 'December' }
+        ],
+        incomeMonth: null,
+        incomeYear: null,
+        yearSelection: [],
+        expenseMonth: null,
+        expenseYear: null,        
+
+        changeData() {
+            this.getRawData();
+            //this.renderChart();
+        },
 
         async getRawData() {
             try {
@@ -70,17 +97,27 @@ document.addEventListener('alpine:init', () => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
                         year: this.currentYear,
-                        user_id: this.user_id
+                        user_id: this.user_id,
+                        selectedMonth: this.selectedMonth
                     })
                 });
                 this.rawData = await response.json();
                 
                 // Extract distinct labels dynamically from JSON
                 if (this.rawData.length > 0) {
-                    this.maxValue = this.rawData[0].maxValue;
-                    this.grossNumber = this.rawData[0].total_income;
-                    this.expenseNumber = this.rawData[0].total_expense;
-                    this.allLabels = this.rawData[0].metrics.map(m => m.label);
+                    let maxV = this.rawData[0].maxValue;
+                    if(this.selectedMonth !== "all") {                      
+                        const dlen = this.rawData.length - 1;                                  
+                        this.maxValue = this.rawData[dlen].maxValue;
+                        this.grossNumber = this.rawData[dlen].total_income;
+                        this.expenseNumber = this.rawData[dlen].total_expense;
+                        this.allLabels = this.rawData[dlen].metrics.map(m => m.label);                        
+                    } else {
+                        this.maxValue = this.rawData[0].maxValue;
+                        this.grossNumber = this.rawData[0].total_income;
+                        this.expenseNumber = this.rawData[0].total_expense;
+                        this.allLabels = this.rawData[0].metrics.map(m => m.label);
+                    }                    
                     this.visibleLabels = [...this.allLabels]; // All visible by default
                 }
             } catch (error) {
@@ -96,9 +133,9 @@ document.addEventListener('alpine:init', () => {
             this.renderChart();
         },
 
-        async initChart() {
-            this.getRawData();
-        },
+        // async initChart() {
+        //     this.getRawData();
+        // },
 
         toggleLabel(label) {
             if (this.visibleLabels.includes(label)) {
@@ -122,13 +159,14 @@ document.addEventListener('alpine:init', () => {
             if (this.visibleLabels.length === 0) return;
 
             // 1. Filter dataset by month selection & visible labels
-            const dataToRender = (this.selectedMonth === 'all' 
-                ? this.rawData 
-                : this.rawData.filter(d => d.month === this.selectedMonth)
-            ).map(monthItem => ({
-                month: monthItem.month,
-                metrics: monthItem.metrics.filter(m => this.visibleLabels.includes(m.label))
-            }));
+            const dataToRender = (
+                this.rawData
+            ).map(monthItem => {      
+                return {
+                    month: monthItem.month,
+                    metrics: monthItem.metrics.filter(m => this.visibleLabels.includes(m.label))
+                }   
+            });
 
             const margin = { top: 1, right: 20, bottom: 30, left: 50 };
             const width = 750 - margin.left - margin.right;
@@ -142,9 +180,10 @@ document.addEventListener('alpine:init', () => {
                 .attr('transform', `translate(${margin.left},${margin.top})`);
 
             // Color Gradients Setup
-            const defs = svg.append('defs');
-            const sampleMetrics = this.rawData[0]?.metrics || [];
+            const defs = svg.append('defs');            
+            const sampleMetrics = this.rawData[0]?.metrics || [];            
             sampleMetrics.forEach((d, i) => {
+                //console.log(d.label, d.colorStart, d.colorEnd);
                 const gradient = defs.append('linearGradient')
                 .attr('id', `gradient-${d.label.replace(/\s+/g, '-')}`)
                 .attr('x1', '0%').attr('y1', '0%')
@@ -156,7 +195,9 @@ document.addEventListener('alpine:init', () => {
 
             // Outer Scale (Months)
             const x0 = d3.scaleBand()
-                .domain(dataToRender.map(d => d.month))
+                .domain(dataToRender.map(d => {
+                    return d.month;
+                }))
                 .range([0, width])
                 .paddingInner(0.25);
 
@@ -204,7 +245,7 @@ document.addEventListener('alpine:init', () => {
                 .attr('class', 'grid')
                 .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat(''))
                 .selectAll('line')
-                .attr('stroke', '#898888')
+                .attr('stroke', '#525252')
                 .attr('stroke-dasharray', '4,4');
 
             // Y-Axis Values (White Text)
@@ -236,10 +277,17 @@ document.addEventListener('alpine:init', () => {
                 .enter()
                 .append('g')
                 .attr('transform', d => `translate(${x0(d.month)},0)`);
-
+            
             // Rectangular Bars
             monthGroups.selectAll('rect')
-                .data(d => d.metrics.map(m => ({ ...m, month: d.month })))
+                .data(d => {
+                    return d.metrics.map(m => {                           
+                        return {
+                            ...m,
+                            month: d.month
+                        }                       
+                    })
+                })
                 .enter()
                 .append('rect')
                 .attr('x', d => x1(d.label))
@@ -367,6 +415,8 @@ document.addEventListener('alpine:init', () => {
                         receipt_number: 'sample',
                         description: 'sample',
                         date_expensed: 'sample',
+                        year: this.expenseYear,
+                        month: this.expenseMonth,
                         mode: "getAll"
                     })
                 });
@@ -374,6 +424,8 @@ document.addEventListener('alpine:init', () => {
                 this.expenses = exp.data;   
             } catch(error) {
                 console.error('Error fetching data:', error);
+            } finally {
+                this.updateTotal('expense');
             }
         },  
 
@@ -392,13 +444,17 @@ document.addEventListener('alpine:init', () => {
                         received_from: 'sample',
                         description: 'sample',
                         date_received: 'sample',
+                        year: this.incomeYear,
+                        month: this.incomeMonth,
                         mode: "getAll"
                     })
                 });
                 let inc = await response.json();
-                this.incomes = inc.data;       
+                this.incomes = inc.data;                            
             } catch(error) {
                 console.error('Error fetching data:', error);
+            } finally {
+                this.updateTotal('income');
             }
         },  
 
@@ -427,9 +483,12 @@ document.addEventListener('alpine:init', () => {
                         user_id: this.user_id,
                         asset: 'sample',
                         amount: 'sample',
+                        receipt_number: 'sample',
                         received_by: 'sample',
                         description: 'sample',
                         date_expensed: 'sample',
+                        year: this.expenseYear,
+                        month: this.expenseMonth,
                         mode: "delete"
                     })
                 });
@@ -454,6 +513,8 @@ document.addEventListener('alpine:init', () => {
                         received_from: 'sample',
                         description: 'sample',
                         date_received: 'sample',
+                        year: this.incomeYear,
+                        month: this.incomeMonth,
                         mode: "delete"
                     })
                 });
@@ -542,6 +603,8 @@ document.addEventListener('alpine:init', () => {
                             received_by: this.received_by,
                             description: this.xdescription,
                             date_expensed: this.date_expensed,
+                            year: this.expenseYear,
+                            month: this.expenseMonth,
                             mode: this.exmode
                         })
                     });
@@ -578,6 +641,8 @@ document.addEventListener('alpine:init', () => {
                             received_from: this.received_from,
                             description: this.description,
                             date_received: this.date_received,
+                            year: this.incomeYear,
+                            month: this.incomeMonth,
                             mode: this.inmode
                         })
                     });
@@ -596,16 +661,26 @@ document.addEventListener('alpine:init', () => {
                     }, 1000);
                 }
         },
+        updateTotal(tp) {
+            let sumOfNumber = 0;
+            if(tp == 'income') {
+                const arrayOfAmount = this.incomes.map(inc => (sumOfNumber += parseFloat(inc.amount)));  
+                this.incomeTotal = currencyFormatter(sumOfNumber, 'PHP');
+            } else if(tp == 'expense') {
+                const arrayOfAmount = this.expenses.map(exp => (sumOfNumber += parseFloat(exp.amount)));  
+                this.expenseTotal = currencyFormatter(sumOfNumber, 'PHP');
+            }
+        },
         navigate(pg) {
             this.getRawData();
             if(pg === "income") {
-                // For income info
+                this.updateTotal('income');
             } else if(pg === "income_form") {
-                // For expenses info                
+                this.date_received = getFullDateByYearMonth(this.incomeYear, this.incomeMonth);  
             } else if(pg === "expense") {
-                // For expenses info
+                this.updateTotal('expense');
             } else if(pg === "expense_form") {
-                // For expenses info
+                this.date_expensed = getFullDateByYearMonth(this.expenseYear, this.expenseMonth);
             } else if(pg === "attendance") {
                 // For attendance info
             } else if(pg === "projection") {
@@ -834,33 +909,33 @@ document.addEventListener('alpine:init', () => {
         //     }));
         // },        
 
-        getMaxNumber() {
-            const incm = Math.max(...this.income);
-            const expn = Math.max(...this.expense);
-            if(incm >= expn) {
-                return incm + 50;
-            } else {
-                return expn + 50;
-            }
-        },
+        // getMaxNumber() {
+        //     const incm = Math.max(...this.income);
+        //     const expn = Math.max(...this.expense);
+        //     if(incm >= expn) {
+        //         return incm + 50;
+        //     } else {
+        //         return expn + 50;
+        //     }
+        // },
         init() {
             this.checkAuth();
-            const currentDate = new Date();
-            this.currentYear = currentDate.getFullYear();
+            this.currentYear = getCurrentDate('y');
+            this.yearSelection = initYearSelection([], 1950, this.currentYear);           
+            this.incomeYear = this.currentYear;
+            this.expenseYear = this.currentYear;
             this.initIncomes();
             this.initExpenses();
             this.initModals();
-            //this.getIncomes();
-            //this.getExpenses();            
-            this.initChart();            
+            this.getRawData();     
         },
         clearForm() {
             this.source = "";
             this.amount = "";
-            this.received_from = "";            
-            this.description = "";            
-            this.received_by = "";     
-            this.asset = "";     
+            this.received_from = "";
+            this.description = "";
+            this.received_by = "";
+            this.asset = "";
             this.date_received = dateTimeNowFormatter('datetime');
             this.date_expensed = dateTimeNowFormatter('datetime');
         },

@@ -5,10 +5,21 @@
     <div
         class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between"
     >
-        <div>
-        <h3 class="text-2xl font-semibold text-gray-300 dark:text-white/90">
-            List of Income
-        </h3>
+        <div class="flex flex-wrap items-center justify-center gap-2">
+            <h3 class="text-2xl font-semibold text-gray-300 dark:text-white/90">
+                List of Income
+            </h3>
+            <select @change.prevent="initIncomes" name="incomeYear" id="incomeYear" x-model="incomeYear" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5  cursor-pointer" placeholder="Select year here">
+                <template x-for="yr in yearSelection" :key="yr">
+                    <option class="text-gray-800" :value="yr" x-text="yr"></option>
+                </template>
+            </select>
+            <select @change.prevent="initIncomes" name="incomeMonth" id="incomeMonth" x-model="incomeMonth" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5 cursor-pointer" placeholder="Select month here">
+                <option class="text-gray-800" value="">All Months</option>
+                <template x-for="item in graphSelection" :key="item.month">
+                    <option class="text-gray-800" :value="item.month" x-text="item.month"></option>
+                </template>
+            </select>
         </div>
 
         <div class="flex items-center gap-3">
@@ -199,9 +210,14 @@
                                     »
                                 </button>                    
                         </div>
-                        <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
-                            # of Items: <span x-text="incomes.length"></span>
-                        </div>
+                        <div class="flex items-center justify-center space-x-1">
+                            <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
+                                Total Income: <span x-text="incomeTotal"></span>
+                            </div>
+                            <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
+                                # of Items: <span x-text="incomes.length"></span>
+                            </div>
+                        </div>                        
                     </div>
                 </td>
             </tr>

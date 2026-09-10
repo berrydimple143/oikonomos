@@ -10,16 +10,16 @@
 			return Income::getProject($id);
 		}
 
-		public function deleteData($id, $uid) {
-			return Income::delete($id, $uid);
+		public function deleteData($id, $uid, $year, $month) {
+			return Income::delete($id, $uid, $year, $month);
 		}
 
 		public function changeStatus($id, $status) {
 			return Income::changeStatus($id, $status);					
 		}
 
-		public function getIncomes($uid) {
-			return Income::getIncomes($uid);
+		public function getIncomes($uid, $year, $month) {
+			return Income::getIncomes($uid, $year, $month);
 		}
 
 		private function lastDay($year, $month) {
@@ -32,7 +32,11 @@
 		public function getIncomePerMonth($year, $month, $uid) {
 			$before = $year.'-'.$month.'-01';
 			$after = $year.'-'.$month.'-'.$this->lastDay($year, $month);
-			return Income::getIncomePerMonth($before, $after, $uid);
+			return Income::getIncomeWithDates($before, $after, $uid);
+		}
+
+		public function getIncomePerWeek($before, $after, $uid) {
+			return Income::getIncomeWithDates($before, $after, $uid);
 		}
 		
 		public function store($data) {
@@ -43,18 +47,20 @@
 			$received_from = trim(htmlspecialchars($data['received_from']));		
             $date_received = date('Y-m-d H:i:s', strtotime(trim(htmlspecialchars($data['date_received']))));            
 			$description = trim(htmlspecialchars($data['description']));
+			$year = trim(htmlspecialchars($data['year']));
+			$month = trim(htmlspecialchars($data['month']));
 			$mode = trim(htmlspecialchars($data['mode']));
 
 			if($source AND $amount) {
 				if($mode == "add") {
-					$inserted = Income::create($user_id, $source, $amount, $received_from, $date_received, $description);
+					$inserted = Income::create($user_id, $source, $amount, $received_from, $date_received, $description, $year, $month);
 					if($inserted) {
 						return $inserted;
 					} else {
 						return false;
 					}
 				} elseif($mode == "edit") {
-					$updated = Income::update($user_id, $source, $amount, $received_from, $date_received, $description, $id);
+					$updated = Income::update($user_id, $source, $amount, $received_from, $date_received, $description, $year, $month, $id);
 					if($updated) {
 						return $updated;
 					} else {

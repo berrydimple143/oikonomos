@@ -10,16 +10,16 @@
 			return Expense::getProject($id);
 		}
 
-		public function deleteData($id, $uid) {
-			return Expense::delete($id, $uid);
+		public function deleteData($id, $uid, $year, $month) {
+			return Expense::delete($id, $uid, $year, $month);
 		}
 
 		public function changeStatus($id, $status) {
 			return Expense::changeStatus($id, $status);					
 		}
 
-		public function getExpenses($uid) {
-			return Expense::getExpenses($uid);
+		public function getExpenses($uid, $year, $month) {
+			return Expense::getExpenses($uid, $year, $month);
 		}
 
 		private function lastDay($year, $month) {
@@ -32,7 +32,11 @@
 		public function getExpensePerMonth($year, $month, $uid) {
 			$before = $year.'-'.$month.'-01';
 			$after = $year.'-'.$month.'-'.$this->lastDay($year, $month);
-			return Expense::getExpensePerMonth($before, $after, $uid);
+			return Expense::getExpenseWithDates($before, $after, $uid);
+		}
+
+		public function getExpensePerWeek($before, $after, $uid) {			
+			return Expense::getExpenseWithDates($before, $after, $uid);
 		}
 		
 		public function store($data) {
@@ -44,18 +48,20 @@
             $date_expensed = date('Y-m-d H:i:s', strtotime(trim(htmlspecialchars($data['date_expensed']))));            
 			$description = trim(htmlspecialchars($data['description']));
             $receipt_number = trim(htmlspecialchars($data['receipt_number']));
+			$year = trim(htmlspecialchars($data['year']));
+			$month = trim(htmlspecialchars($data['month']));
 			$mode = trim(htmlspecialchars($data['mode']));
 
 			if($asset AND $amount) {
 				if($mode == "add") {
-					$inserted = Expense::create($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number);
+					$inserted = Expense::create($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $year, $month);
 					if($inserted) {
 						return $inserted;
 					} else {
 						return false;
 					}
 				} elseif($mode == "edit") {
-					$updated = Expense::update($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $id);
+					$updated = Expense::update($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $year, $month, $id);
 					if($updated) {
 						return $updated;
 					} else {

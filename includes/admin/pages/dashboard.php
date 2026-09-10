@@ -21,10 +21,10 @@
             <!-- Month Selector -->
             <div class="flex items-center gap-2">
                 <label for="month-select" class="text-xs font-semibold text-white">View:</label>
-                <select id="month-select" x-model="selectedMonth" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <select @change.prevent="changeData" id="month-select" x-model="selectedMonth" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="all">All Months</option>
-                    <template x-for="item in rawData" :key="item.month">
-                    <option :value="item.month" x-text="item.month"></option>
+                    <template x-for="item in graphSelection" :key="item.abbr">
+                        <option :value="item.abbr" x-text="item.month"></option>
                     </template>
                 </select>
             </div>       
