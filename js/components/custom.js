@@ -32,23 +32,27 @@ document.addEventListener('alpine:init', () => {
         incomeModal: null,
         viewIncomeModal: null,
         incomeAPI: '../api/admin/income.php',
-        incomeCounterAPI: '../api/admin/countIncome.php',
+        //incomeCounterAPI: '../api/admin/countIncome.php',
         incomeTotal: 0,
         currentPage: 1,
         searchQuery: '',
         pageSize: 7,
         maxVisibleButtons: 5,
         masterChart: null,
-        grossNumber: 0,
+        grossNumber: 0,        
+        incomeMonth: null,
+        incomeYear: null,
         // Expenses 
         received_by: '',
         asset: '',
         xdescription: '',
         receipt_number: '',
+        expenseModal: null,
+        viewExpenseModal: null,
         expensed_on: dateTimeNowFormatter('datetime'),
         date_expensed: dateTimeNowFormatter('datetime'),
         expenseAPI: '../api/admin/expense.php',
-        expenseCounterAPI: '../api/admin/countExpense.php',      
+        //expenseCounterAPI: '../api/admin/countExpense.php',      
         expenseTotal: 0,  
         expenses: [],
         expenseId: null,
@@ -58,6 +62,29 @@ document.addEventListener('alpine:init', () => {
         xsearchQuery: '',
         xpageSize: 7,
         xmaxVisibleButtons: 5,
+        expenseMonth: null,
+        expenseYear: null,
+        // Attendance
+        attendanceModal: null,
+        viewAttendanceModal: null,
+        attendanceAPI: '../api/admin/attendance.php',     
+        date_attended: dateTimeNowFormatter('datetime'),
+        attended_on: dateTimeNowFormatter('datetime'),
+        quantity: '',
+        classification: '',
+        attdescription: '',        
+        attendanceTotal: 0,          
+        attendances: [],
+        attendanceId: null,
+        attendanceNumber: 0,
+        attmode: 'add',
+        attCurrentPage: 1,
+        attSearchQuery: '',
+        attPageSize: 7,
+        attMaxVisibleButtons: 5,
+        attendanceYear: null,
+        attendanceMonth: null,
+        
         // D3.js Chart - Start
         rawData: [],
         selectedMonth: 'all',
@@ -79,11 +106,8 @@ document.addEventListener('alpine:init', () => {
                 { abbr: 'Nov', month: 'November' },
                 { abbr: 'Dec', month: 'December' }
         ],
-        incomeMonth: null,
-        incomeYear: null,
         yearSelection: [],
-        expenseMonth: null,
-        expenseYear: null,        
+                
 
         changeData() {
             this.getRawData();
@@ -111,11 +135,13 @@ document.addEventListener('alpine:init', () => {
                         this.maxValue = this.rawData[dlen].maxValue;
                         this.grossNumber = this.rawData[dlen].total_income;
                         this.expenseNumber = this.rawData[dlen].total_expense;
+                        this.attendanceNumber = this.rawData[dlen].total_attendance;
                         this.allLabels = this.rawData[dlen].metrics.map(m => m.label);                        
                     } else {
                         this.maxValue = this.rawData[0].maxValue;
                         this.grossNumber = this.rawData[0].total_income;
                         this.expenseNumber = this.rawData[0].total_expense;
+                        this.attendanceNumber = this.rawData[0].total_attendance;
                         this.allLabels = this.rawData[0].metrics.map(m => m.label);
                     }                    
                     this.visibleLabels = [...this.allLabels]; // All visible by default
@@ -131,11 +157,7 @@ document.addEventListener('alpine:init', () => {
             this.$watch('rawData', () => this.renderChart());
 
             this.renderChart();
-        },
-
-        // async initChart() {
-        //     this.getRawData();
-        // },
+        },        
 
         toggleLabel(label) {
             if (this.visibleLabels.includes(label)) {
@@ -458,10 +480,63 @@ document.addEventListener('alpine:init', () => {
             }
         },  
 
-        deleteIncomeConfirm(id) {
-            const decision = confirm("Are you sure you want to delete this income?");
+        async initAttendances() {
+            this.attmode = 'add';
+            try {
+                let response = await fetch(this.attendanceAPI, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        id: 2,
+                        status: 1,
+                        user_id: this.user_id,
+                        quantity: 'sample',
+                        classification: 'sample',
+                        description: 'sample',
+                        date_attended: 'sample',
+                        year: this.attendanceYear,
+                        month: this.attendanceMonth,
+                        mode: "getAll"
+                    })
+                });
+                let att = await response.json();
+                this.attendances = att.data;
+            } catch(error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                this.updateTotal('attendance');
+            }
+        },         
+
+        deleteAttendanceConfirm(id) {
+            const decision = confirm("Are you sure you want to delete this attendance?");
             if(decision) {
-                this.deleteIncome(id);
+                this.deleteAttendance(id);
+            }
+        },
+
+        async deleteAttendance(id) {
+            try {
+                let response = await fetch(this.attendanceAPI, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        id: id,
+                        status: 1,
+                        user_id: this.user_id,
+                        quantity: 'sample',
+                        classification: 'sample',
+                        description: 'sample',
+                        date_attended: 'sample',
+                        year: this.attendanceYear,
+                        month: this.attendanceMonth,
+                        mode: "delete"
+                    })
+                });
+                let info = await response.json();
+                this.attendances = info.data;
+            } catch(error) {
+                console.error('Error fetching data:', error);
             }
         },
 
@@ -496,6 +571,13 @@ document.addEventListener('alpine:init', () => {
                 this.expenses = info.data;
             } catch(error) {
                 console.error('Error fetching data:', error);
+            }
+        },
+
+        deleteIncomeConfirm(id) {
+            const decision = confirm("Are you sure you want to delete this income?");
+            if(decision) {
+                this.deleteIncome(id);
             }
         },
 
@@ -550,6 +632,17 @@ document.addEventListener('alpine:init', () => {
             this.navigate('expense_form');
         },
 
+        editAttendance(info) {
+            this.attmode = 'edit';
+            this.quantity = info.quantity;
+            this.classification = info.classification;
+            this.user_id = info.user_id;
+            this.date_attended = info.date_attended;
+            this.attdescription = info.description;
+            this.attendanceId = info.id;
+            this.navigate('attendance_form');
+        },
+
         viewIncome(info) {
             this.source = info.source;
             this.amount = currencyFormatter(info.amount, 'PHP');
@@ -585,6 +678,56 @@ document.addEventListener('alpine:init', () => {
             this.viewExpenseModal.classList.add('hidden');
         },       
 
+        viewAttendance(info) {
+            this.quantity = info.quantity + ' people';
+            this.classification = info.classification;
+            this.user_id = info.user_id;
+            this.date_attended = info.date_attended;
+            this.attended_on = info.attended_on;
+            this.attdescription = info.description;
+            this.attendanceId = info.id;
+            this.viewAttendanceModal.classList.remove('hidden');
+        },
+
+        closeAttendanceDetails() {
+            this.clearForm();
+            this.viewAttendanceModal.classList.add('hidden');
+        },
+
+        async submitAttendance() {
+            let id = 2;
+            if(this.attmode == 'edit') { id = this.attendanceId; }
+                try {
+                    this.attendanceModal.classList.remove('hidden');
+                    let response = await fetch(this.attendanceAPI, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ 
+                            id: id,
+                            status: 1,
+                            user_id: this.user_id,
+                            quantity: this.quantity,
+                            classification: this.classification,
+                            description: this.attdescription,
+                            date_attended: this.date_attended,
+                            year: this.attendanceYear,
+                            month: this.attendanceMonth,
+                            mode: this.attmode
+                        })
+                    });
+                    let info = await response.json();
+                    this.attendances = info.data;
+                } catch(error) {
+                    console.error('Error fetching data:', error);
+                } finally {                   
+                    setTimeout(() => {                        
+                        this.navigate('attendance');
+                        this.clearForm();
+                        this.attendanceModal.classList.add('hidden');
+                    }, 1000);
+                }
+        },
+
         async submitExpense() {
             let id = 2;
             if(this.exmode == 'edit') { id = this.expenseId; }
@@ -612,14 +755,11 @@ document.addEventListener('alpine:init', () => {
                     this.expenses = info.data;
                 } catch(error) {
                     console.error('Error fetching data:', error);
-                } finally {          
-                    //this.getExpenses();                    
+                } finally {                     
                     setTimeout(() => {                        
                         this.navigate('expense');
                         this.clearForm();
                         this.expenseModal.classList.add('hidden');
-                        // this.masterChart.data.datasets[0].data = this.expense;
-                        // this.masterChart.update();
                     }, 1000);
                 }
         },
@@ -650,14 +790,11 @@ document.addEventListener('alpine:init', () => {
                     this.incomes = info.data;
                 } catch(error) {
                     console.error('Error fetching data:', error);
-                } finally {          
-                    //this.getIncomes();                           
+                } finally {               
                     setTimeout(() => {                        
                         this.navigate('income');
                         this.clearForm();
-                        this.incomeModal.classList.add('hidden');                        
-                        // this.masterChart.data.datasets[0].data = this.income;
-                        // this.masterChart.update();
+                        this.incomeModal.classList.add('hidden');
                     }, 1000);
                 }
         },
@@ -669,6 +806,9 @@ document.addEventListener('alpine:init', () => {
             } else if(tp == 'expense') {
                 const arrayOfAmount = this.expenses.map(exp => (sumOfNumber += parseFloat(exp.amount)));  
                 this.expenseTotal = currencyFormatter(sumOfNumber, 'PHP');
+            } else if(tp == 'attendance') {
+                const arrayOfAmount = this.attendances.map(att => (sumOfNumber += att.quantity));
+                this.attendanceTotal = sumOfNumber;
             }
         },
         navigate(pg) {
@@ -676,13 +816,21 @@ document.addEventListener('alpine:init', () => {
             if(pg === "income") {
                 this.updateTotal('income');
             } else if(pg === "income_form") {
-                this.date_received = getFullDateByYearMonth(this.incomeYear, this.incomeMonth);  
+                if(this.inmode == "add") {
+                    this.date_received = getFullDateByYearMonth(this.incomeYear, this.incomeMonth);
+                }                  
             } else if(pg === "expense") {
                 this.updateTotal('expense');
             } else if(pg === "expense_form") {
-                this.date_expensed = getFullDateByYearMonth(this.expenseYear, this.expenseMonth);
+                if(this.exmode == "add") {
+                    this.date_expensed = getFullDateByYearMonth(this.expenseYear, this.expenseMonth);
+                }                
             } else if(pg === "attendance") {
-                // For attendance info
+                this.updateTotal('attendance');
+            } else if(pg === "attendance_form") {
+                if(this.attmode == "add") {
+                    this.date_attended = getFullDateByYearMonth(this.attendanceYear, this.attendanceMonth);
+                }
             } else if(pg === "projection") {
                 // For projection info
             }            
@@ -707,8 +855,10 @@ document.addEventListener('alpine:init', () => {
         initModals() {
             this.incomeModal = document.getElementById('incomeModal');
             this.expenseModal = document.getElementById('expenseModal');
+            this.attendanceModal = document.getElementById('attendanceModal');
             this.viewIncomeModal = document.getElementById('viewIncomeModal');
-            this.viewExpenseModal = document.getElementById('viewExpenseModal');                   
+            this.viewExpenseModal = document.getElementById('viewExpenseModal');    
+            this.viewAttendanceModal = document.getElementById('viewAttendanceModal');                
         },
         // initChart() {
         //     let grossIncome = this.grossNumber;
@@ -924,8 +1074,10 @@ document.addEventListener('alpine:init', () => {
             this.yearSelection = initYearSelection([], 1950, this.currentYear);           
             this.incomeYear = this.currentYear;
             this.expenseYear = this.currentYear;
+            this.attendanceYear = this.currentYear;
             this.initIncomes();
             this.initExpenses();
+            this.initAttendances();
             this.initModals();
             this.getRawData();     
         },
@@ -934,10 +1086,15 @@ document.addEventListener('alpine:init', () => {
             this.amount = "";
             this.received_from = "";
             this.description = "";
+            this.attdescription = "";
+            this.xdescription = "";
             this.received_by = "";
             this.asset = "";
+            this.quantity = "";
+            this.classification = "";
             this.date_received = dateTimeNowFormatter('datetime');
             this.date_expensed = dateTimeNowFormatter('datetime');
+            this.date_attended = dateTimeNowFormatter('datetime');
         },
 
         get totalPages() {
@@ -1005,6 +1162,47 @@ document.addEventListener('alpine:init', () => {
             if (end > this.xtotalPages) {
                 end = this.xtotalPages;
                 start = Math.max(1, end - this.xmaxVisibleButtons + 1);
+            }
+
+            const pages = [];
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            return pages;
+        },
+
+        // For Attendance
+
+        get attTotalPages() {
+            return Math.ceil(this.attFilteredItems.length / this.attPageSize);
+        },
+        get attPaginatedItems() {
+            const start = (this.attCurrentPage - 1) * this.attPageSize;
+            const end = start + this.attPageSize;
+            return this.attFilteredItems.slice(start, end);
+        },
+        get attFilteredItems() {
+            return this.attendances.filter(item => {
+                    let quantity = item.quantity.toString();
+                    return (quantity.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.classification.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.description.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.attended_on.toLowerCase().includes(this.attSearchQuery.toLowerCase()))
+            });
+        },
+        nextPage() {
+            if (this.attCurrentPage < this.attTotalPages) this.attCurrentPage++;
+        },
+        prevPage() {
+            if (this.attCurrentPage > 1) this.attCurrentPage--;
+        },
+        goToPage(page) {
+            this.attCurrentPage = page;
+        },
+        get attVisiblePages() {
+            let start = Math.max(1, this.attCurrentPage - Math.floor(this.attMaxVisibleButtons / 2));
+            let end = start + this.attMaxVisibleButtons - 1;
+
+            if (end > this.attTotalPages) {
+                end = this.attTotalPages;
+                start = Math.max(1, end - this.attMaxVisibleButtons + 1);
             }
 
             const pages = [];

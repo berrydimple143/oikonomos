@@ -28,8 +28,10 @@
   <body x-data="dashboardLoad">
     <?php include('../includes/admin/modals/incomeModal.php'); ?>
     <?php include('../includes/admin/modals/viewIncomeModal.php'); ?>
-    <?php include('../includes/admin/modals/expenseModal.php'); ?>
-    <?php include('../includes/admin/modals/viewExpenseModal.php'); ?>    
+    <?php include('../includes/admin/modals/expenseModal.php'); ?>    
+    <?php include('../includes/admin/modals/viewExpenseModal.php'); ?>   
+    <?php include('../includes/admin/modals/attendanceModal.php'); ?>     
+    <?php include('../includes/admin/modals/viewAttendanceModal.php'); ?>
     <?php include('../includes/admin/preloader.php'); ?>
     <div class="flex h-screen overflow-hidden">
       <?php include('../includes/admin/sidebar.php'); ?>
@@ -45,6 +47,7 @@
                     <?php include('../includes/admin/pages/expense.php'); ?>
                     <?php include('../includes/admin/pages/expense_form.php'); ?>
                     <?php include('../includes/admin/pages/attendance.php'); ?>
+                    <?php include('../includes/admin/pages/attendance_form.php'); ?>
                     <?php include('../includes/admin/pages/projection.php'); ?>
                 </div>
           </div>

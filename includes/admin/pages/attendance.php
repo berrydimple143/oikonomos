@@ -5,10 +5,21 @@
     <div
         class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between"
     >
-        <div>
-        <h3 class="text-2xl font-semibold text-gray-300 dark:text-white/90">
-            List of Attendance
-        </h3>
+        <div class="flex flex-wrap items-center justify-center gap-2">
+            <h3 class="text-2xl font-semibold text-gray-300 dark:text-white/90">
+                List of Attendance
+            </h3>
+            <select @change.prevent="initAttendances" name="attendanceYear" id="attendanceYear" x-model="attendanceYear" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5  cursor-pointer" placeholder="Select year here">
+                <template x-for="yr in yearSelection" :key="yr">
+                    <option class="text-gray-800" :value="yr" x-text="yr"></option>
+                </template>
+            </select>
+            <select @change.prevent="initAttendances" name="attendanceMonth" id="attendanceMonth" x-model="attendanceMonth" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5 cursor-pointer" placeholder="Select month here">
+                <option class="text-gray-800" value="">All Months</option>
+                <template x-for="item in graphSelection" :key="item.month">
+                    <option class="text-gray-800" :value="item.month" x-text="item.month"></option>
+                </template>
+            </select>
         </div>
 
         <div class="flex items-center gap-3">
@@ -23,9 +34,9 @@
             type="text"
             placeholder="Search here ..."
             id="search-input" 
-            x-model="searchQuery" 
-            @input="currentPage = 1"  
-            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-100 focus:ring-brand-200/10 dark:focus:border-brand-400 h-9 w-full rounded-lg border border-gray-200 bg-transparent py-2.0 pr-14 pl-12 text-sm text-white placeholder:text-white focus:ring-1 focus:outline-hidden lg:w-[350px] dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30"
+            x-model="attSearchQuery" 
+            @input="attCurrentPage = 1"  
+            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-100 focus:ring-brand-200/10 dark:focus:border-brand-400 h-9 w-full rounded-lg border border-gray-200 bg-transparent py-2.0 pr-14 pl-12 text-sm text-white placeholder:text-white focus:ring-1 focus:outline-hidden lg:w-[310px] dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30"
         />
 
         <button
@@ -36,7 +47,7 @@
             <span> F </span>
         </button>
         </div>        
-        <button @click.prevent="navigate('income_form')" type="button" class="inline-flex items-center  text-[#04ea13] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5  cursor-pointer">                                
+        <button @click.prevent="navigate('attendance_form')" type="button" class="inline-flex items-center  text-[#04ea13] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5  cursor-pointer">                                
             <?php includeWithArgs('../images/icons/add.php', ['color' => '#04ea13', 'class' => 'w-4 h-4 mr-1', 'view' => '0 0 24 24']); ?>
                 ADD ATTENDANCE
             </button>
@@ -52,31 +63,24 @@
                 <th class="py-2 h-auto">
                     <div class="flex items-center">
                     <p>
-                        Source
+                        Classification
                     </p>
                     </div>
                 </th>
-                <th class="py-2 h-auto">
+                <th class="py-2 h-auto text-center">
                     <div class="flex items-center">
                     <p>
-                        Amount
+                        No. of Attendees
                     </p>
                     </div>
                 </th class="py-2 h-auto">
                 <th class="py-2">
                     <div class="flex items-center">
                     <p>
-                        Date Received
+                        Date Attended
                     </p>
                     </div>
-                </th>
-                <th class="py-2">
-                    <div class="flex items-center">
-                    <p>
-                        Received From
-                    </p>
-                    </div>
-                </th>
+                </th>                
                 <th class="py-2 w-[12%] h-auto">
                     <div class="flex items-center justify-center col-span-2">
                         <p>Action</p>
@@ -87,7 +91,7 @@
         <!-- table header end -->
 
         <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-            <template x-for="(inc, index) in paginatedItems" :key="inc.id">
+            <template x-for="(att, index) in attPaginatedItems" :key="att.id">
                 <tr class="text-sm text-gray-100 text-theme-sm dark:text-white/90">
                     <td class="py-2">
                         <div class="flex items-center gap-3">
@@ -96,40 +100,34 @@
                     </td>
                     <td class="py-2">
                         <div class="flex items-center gap-3">
-                            <div><p x-text="inc.source"></p></div>
+                            <div><p x-text="att.classification"></p></div>
+                        </div>
+                    </td>
+                    <td class="py-2 text-center">
+                        <div class="flex items-center text-center">
+                        <p x-text="att.quantity" class="text-gray-100 text-center text-theme-sm dark:text-gray-400"></p>
                         </div>
                     </td>
                     <td class="py-2">
                         <div class="flex items-center">
-                        <p x-text="currencyFormatter(inc.amount, 'PHP')" class="text-gray-100 text-theme-sm dark:text-gray-400"></p>
-                        </div>
-                    </td>
-                    <td class="py-2">
-                        <div class="flex items-center">
-                        <p x-html="inc.received_on">
-                        </p>
-                        </div>
-                    </td>
-                    <td class="py-2">
-                        <div class="flex items-center">
-                        <p x-html="inc.received_from">
+                        <p x-text="att.attended_on">
                         </p>
                         </div>
                     </td>
                     <td class="py-2">
                         <div class="flex items-center justify-center">
                             
-                                <button type="button" @click="editIncome(inc)" class="inline-flex items-center text-[#fae62c] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1 focus:outline-none cursor-pointer">
+                                <button type="button" @click="editAttendance(att)" class="inline-flex items-center text-[#fae62c] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1 focus:outline-none cursor-pointer">
                                 <?php includeWithArgs('../images/icons/edit.php', ['color' => '#fae62c', 'class' => 'w-4 h-4 mr-1', 'view' => '0 0 494.936 494.936']); ?>
                                     Edit
                                 </button>         
                                 
-                                <button @click.prevent="deleteIncomeConfirm(inc.id)" type="button" class="inline-flex items-center text-[#fe4444] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1  cursor-pointer">                                
+                                <button @click.prevent="deleteAttendanceConfirm(att.id)" type="button" class="inline-flex items-center text-[#fe4444] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1  cursor-pointer">                                
                                 <?php includeWithArgs('../images/icons/delete.php', ['color' => '#fe4444', 'class' => 'w-4 h-4 mr-1', 'view' => '0 0 24 24']); ?>
                                     Delete
                                 </button>
 
-                                <button @click.prevent="viewIncome(inc)" type="button" class="inline-flex items-center text-[#23ddfa] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1  cursor-pointer">
+                                <button @click.prevent="viewAttendance(att)" type="button" class="inline-flex items-center text-[#23ddfa] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1  cursor-pointer">
                                 <?php includeWithArgs('../images/icons/magnify.php', ['color' => '#23ddfa', 'class' => 'w-3 h-3 mr-1', 'view' => '0 0 20 20']); ?>
                                     View
                                 </button>
@@ -138,9 +136,9 @@
                     </td>
                 </tr>
             </template>            
-            <template x-if="incomes.length === 0">
+            <template x-if="attendances.length === 0">
                 <tr class="border-b border-gray-200">
-                    <td colspan="6" class="text-center text-gray-100">
+                    <td colspan="5" class="text-center text-gray-100">
                         No data found yet ...
                     </td>
                 </tr>
@@ -148,60 +146,65 @@
         </tbody>
         <tfoot>        
             <tr>                
-                <td colspan="6">                
+                <td colspan="5">                
                     <div class="flex items-center justify-between">
                         <!-- Pagination Container -->
                         <div class="flex items-center space-x-1 p-2 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] box-border">                    
                                 <!-- Summary Information Indicator -->
                                 <span class="text-lg text-white mr-2">
-                                    Page <span class="font-semibold" x-text="currentPage"></span> of <span class="font-semibold" x-text="totalPages"></span>
+                                    Page <span class="font-semibold" x-text="attCurrentPage"></span> of <span class="font-semibold" x-text="attTotalPages"></span>
                                 </span>
                                 
                                 <!-- First & Previous Buttons -->
                                 <button 
                                     class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold" 
-                                    @click="currentPage = 1" 
-                                    :disabled="currentPage === 1"
-                                    :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                    @click="attCurrentPage = 1" 
+                                    :disabled="attCurrentPage === 1"
+                                    :class="attCurrentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                     «
                                 </button>
                                 <button 
                                     class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
-                                    @click="currentPage--" 
-                                    :disabled="currentPage === 1"
-                                    :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                    @click="attCurrentPage--" 
+                                    :disabled="attCurrentPage === 1"
+                                    :class="attCurrentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                     ‹
                                 </button>
 
                                 <!-- Truncated Page Numbers -->
-                                <template x-for="page in visiblePages" :key="page">
+                                <template x-for="page in attVisiblePages" :key="page">
                                     <button 
                                         class="px-3 py-1 font-bold border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border"
-                                        @click="currentPage = page" 
+                                        @click="attCurrentPage = page" 
                                         x-text="page"
-                                        :class="currentPage === page ? 'px-4 py-2 bg-gradient-to-t from-slate-400 via-slate-600 to-slate-400 text-white' : 'text-gray-400 cursor-pointer'">
+                                        :class="attCurrentPage === page ? 'px-4 py-2 bg-gradient-to-t from-slate-400 via-slate-600 to-slate-400 text-white' : 'text-gray-400 cursor-pointer'">
                                     </button>
                                 </template>
 
                                 <!-- Next & Last Buttons -->
                                 <button 
                                     class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
-                                    @click="currentPage++" 
-                                    :disabled="currentPage === totalPages"
-                                    :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                    @click="attCurrentPage++" 
+                                    :disabled="attCurrentPage === attTotalPages"
+                                    :class="attCurrentPage === attTotalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                     ›
                                 </button>
                                 <button 
                                     class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
-                                    @click="currentPage = totalPages" 
-                                    :disabled="currentPage === totalPages"
-                                    :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                    @click="attCurrentPage = attTotalPages" 
+                                    :disabled="attCurrentPage === attTotalPages"
+                                    :class="attCurrentPage === attTotalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                     »
                                 </button>                    
                         </div>
-                        <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
-                            # of Items: <span x-text="incomes.length"></span>
-                        </div>
+                        <div class="flex items-center justify-center space-x-1">
+                            <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
+                                Total Attendance: <span x-text="attendanceTotal"></span>
+                            </div>
+                            <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
+                                # of Entry: <span x-text="attendances.length"></span>
+                            </div>
+                        </div>                        
                     </div>
                 </td>
             </tr>

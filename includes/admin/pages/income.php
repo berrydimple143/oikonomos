@@ -215,7 +215,7 @@
                                 Total Income: <span x-text="incomeTotal"></span>
                             </div>
                             <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
-                                # of Items: <span x-text="incomes.length"></span>
+                                # of Entry: <span x-text="incomes.length"></span>
                             </div>
                         </div>                        
                     </div>

@@ -2,7 +2,7 @@
 <?php
 	require "../../autoload.php";
 	header("Content-Type: application/json");	
-	use App\Controllers\IncomeController;
+	use App\Controllers\AttendanceController;
 
 	if($_SERVER['REQUEST_METHOD'] === "POST") {		
 		$input = json_decode(file_get_contents("php://input"));
@@ -10,8 +10,8 @@
         $data = [
 			'id' => $input->id,			
 			'user_id' => $input->user_id,
-			'source' => $input->source,			
-			'amount' => $input->amount,
+			'quantity' => $input->quantity,			
+			'classification' => $input->classification,
             'mode' => $mode
 		];
 		foreach($data as $key => $value) {
@@ -25,17 +25,16 @@
 			}
 		}
 		$data['status'] = $input->status;
-		$data['received_from'] = $input->received_from;
-		$data['date_received'] = $input->date_received;
+		$data['date_attended'] = $input->date_attended;
 		$data['description'] = $input->description;
 		$data['year'] = $input->year;
 		$data['month'] = $input->month;
 
-		$controller = new IncomeController();
+		$controller = new AttendanceController();
         if($mode == 'add' || $mode == 'edit') {
             $info = $controller->store($data);
 		} elseif($mode == 'getAll') {
-			$info = $controller->getIncomes($input->user_id, $input->year, $input->month);
+			$info = $controller->getAttendances($input->user_id, $input->year, $input->month);
 		} elseif($mode == 'delete') {
 			$info = $controller->deleteData($input->id, $input->user_id, $input->year, $input->month);
 		} elseif($mode == 'search') {

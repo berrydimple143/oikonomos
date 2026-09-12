@@ -215,7 +215,7 @@
                                 Total Expense: <span x-text="expenseTotal"></span>
                             </div>
                             <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
-                                # of Items: <span x-text="expenses.length"></span>
+                                # of Entry: <span x-text="expenses.length"></span>
                             </div>
                         </div>
                     </div>
