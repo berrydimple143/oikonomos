@@ -42,6 +42,8 @@ document.addEventListener('alpine:init', () => {
         grossNumber: 0,        
         incomeMonth: null,
         incomeYear: null,
+        incomeSources: [],
+        incomeSource: null,
         // Expenses 
         received_by: '',
         asset: '',
@@ -53,7 +55,7 @@ document.addEventListener('alpine:init', () => {
         date_expensed: dateTimeNowFormatter('datetime'),
         expenseAPI: '../api/admin/expense.php',
         //expenseCounterAPI: '../api/admin/countExpense.php',      
-        expenseTotal: 0,  
+        expenseTotal: 0,          
         expenses: [],
         expenseId: null,
         expenseNumber: 0,
@@ -64,6 +66,8 @@ document.addEventListener('alpine:init', () => {
         xmaxVisibleButtons: 5,
         expenseMonth: null,
         expenseYear: null,
+        expenseSources: [],
+        expenseSource: null,
         // Attendance
         attendanceModal: null,
         viewAttendanceModal: null,
@@ -88,31 +92,29 @@ document.addEventListener('alpine:init', () => {
         // D3.js Chart - Start
         rawData: [],
         selectedMonth: 'all',
+        selectedYear: null,
         allLabels: [],
         visibleLabels: [],
         chartDataAPI: '../api/admin/chart.php',
         maxValue: 0,
+        maxValueOfIncome: 0,
+        maxValueOfExpense: 0,
+        maxValueOfAttendance: 0,
         graphSelection: [
-                { abbr: 'Jan', month: 'January' },
-                { abbr: 'Feb', month: 'February' },
-                { abbr: 'Mar', month: 'March' },
-                { abbr: 'Apr', month: 'April' },
-                { abbr: 'May', month: 'May' },
-                { abbr: 'Jun', month: 'June' },
-                { abbr: 'Jul', month: 'July' },
-                { abbr: 'Aug', month: 'August' },
-                { abbr: 'Sep', month: 'September' },
-                { abbr: 'Oct', month: 'October' },
-                { abbr: 'Nov', month: 'November' },
-                { abbr: 'Dec', month: 'December' }
+            { abbr: 'Jan', month: 'January' },
+            { abbr: 'Feb', month: 'February' },
+            { abbr: 'Mar', month: 'March' },
+            { abbr: 'Apr', month: 'April' },
+            { abbr: 'May', month: 'May' },
+            { abbr: 'Jun', month: 'June' },
+            { abbr: 'Jul', month: 'July' },
+            { abbr: 'Aug', month: 'August' },
+            { abbr: 'Sep', month: 'September' },
+            { abbr: 'Oct', month: 'October' },
+            { abbr: 'Nov', month: 'November' },
+            { abbr: 'Dec', month: 'December' }
         ],
-        yearSelection: [],
-                
-
-        changeData() {
-            this.getRawData();
-            //this.renderChart();
-        },
+        yearSelection: [],                
 
         async getRawData() {
             try {
@@ -120,31 +122,36 @@ document.addEventListener('alpine:init', () => {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
-                        year: this.currentYear,
+                        year: this.selectedYear ? this.selectedYear : this.currentYear,
                         user_id: this.user_id,
                         selectedMonth: this.selectedMonth
                     })
                 });
                 this.rawData = await response.json();
-                
-                // Extract distinct labels dynamically from JSON
+                console.log(this.rawData);
                 if (this.rawData.length > 0) {
                     let maxV = this.rawData[0].maxValue;
-                    if(this.selectedMonth !== "all") {                      
-                        const dlen = this.rawData.length - 1;                                  
+                    if(this.selectedMonth !== "all") {
+                        const dlen = this.rawData.length - 1;
                         this.maxValue = this.rawData[dlen].maxValue;
+                        this.maxValueOfIncome = this.rawData[dlen].maxValueOfIncome;
+                        this.maxValueOfExpense = this.rawData[dlen].maxValueOfExpense;
+                        this.maxValueOfAttendance = this.rawData[dlen].maxValueOfAttendance;
                         this.grossNumber = this.rawData[dlen].total_income;
                         this.expenseNumber = this.rawData[dlen].total_expense;
                         this.attendanceNumber = this.rawData[dlen].total_attendance;
                         this.allLabels = this.rawData[dlen].metrics.map(m => m.label);                        
                     } else {
                         this.maxValue = this.rawData[0].maxValue;
+                        this.maxValueOfIncome = this.rawData[0].maxValueOfIncome;
+                        this.maxValueOfExpense = this.rawData[0].maxValueOfExpense;
+                        this.maxValueOfAttendance = this.rawData[0].maxValueOfAttendance;
                         this.grossNumber = this.rawData[0].total_income;
                         this.expenseNumber = this.rawData[0].total_expense;
                         this.attendanceNumber = this.rawData[0].total_attendance;
                         this.allLabels = this.rawData[0].metrics.map(m => m.label);
                     }                    
-                    this.visibleLabels = [...this.allLabels]; // All visible by default
+                    this.visibleLabels = [...this.allLabels]; // All visible by default                    
                 }
             } catch (error) {
                 console.error("Error loading JSON data:", error);
@@ -165,6 +172,19 @@ document.addEventListener('alpine:init', () => {
             } else {
                 this.visibleLabels.push(label);
             }
+            let maxBar = [];
+            this.visibleLabels.forEach(lb => {                
+                if(lb == "Income") {
+                    maxBar.push(this.maxValueOfIncome);
+                }
+                if(lb == "Expenses") {
+                    maxBar.push(this.maxValueOfExpense);
+                }
+                if(lb == "Attendance") {
+                    maxBar.push(this.maxValueOfAttendance);
+                }
+            }); 
+            this.maxValue = Math.max(...maxBar);
         },
 
         getLabelColor(label) {
@@ -251,7 +271,7 @@ document.addEventListener('alpine:init', () => {
                 .attr('y', 12)
                 .attr('x', width / 2)
                 .attr('text-anchor', 'start')
-                .attr('class', 'fill-gray-100 text-[10px] font-semibold tracking-normal')
+                .attr('class', 'fill-gray-100 text-[11px] font-semibold tracking-normal')
                 .text(computations);                        
 
             // X-Axis
@@ -422,7 +442,7 @@ document.addEventListener('alpine:init', () => {
         // },
 
         async initExpenses() {
-            this.inmode = 'add';
+            this.exmode = 'add';
             try {
                 let response = await fetch(this.expenseAPI, {
                     method: 'POST',
@@ -436,6 +456,7 @@ document.addEventListener('alpine:init', () => {
                         received_by: 'sample',
                         receipt_number: 'sample',
                         description: 'sample',
+                        expenseSource: this.expenseSource,
                         date_expensed: 'sample',
                         year: this.expenseYear,
                         month: this.expenseMonth,
@@ -444,12 +465,17 @@ document.addEventListener('alpine:init', () => {
                 });
                 let exp = await response.json();
                 this.expenses = exp.data;   
+                this.expenses.map(dat => {
+                    if(!this.expenseSources.includes(dat.asset)) {
+                        this.expenseSources.push(dat.asset);
+                    }
+                });
             } catch(error) {
                 console.error('Error fetching data:', error);
             } finally {
                 this.updateTotal('expense');
             }
-        },  
+        },
 
         async initIncomes() {
             this.inmode = 'add';
@@ -463,6 +489,7 @@ document.addEventListener('alpine:init', () => {
                         user_id: this.user_id,
                         source: 'sample',
                         amount: 'sample',
+                        incomeSource: this.incomeSource,
                         received_from: 'sample',
                         description: 'sample',
                         date_received: 'sample',
@@ -472,7 +499,12 @@ document.addEventListener('alpine:init', () => {
                     })
                 });
                 let inc = await response.json();
-                this.incomes = inc.data;                            
+                this.incomes = inc.data;
+                this.incomes.map(dat => {
+                    if(!this.incomeSources.includes(dat.source)) {
+                        this.incomeSources.push(dat.source);
+                    }
+                });
             } catch(error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -562,6 +594,7 @@ document.addEventListener('alpine:init', () => {
                         received_by: 'sample',
                         description: 'sample',
                         date_expensed: 'sample',
+                        expenseSource: this.expenseSource,
                         year: this.expenseYear,
                         month: this.expenseMonth,
                         mode: "delete"
@@ -593,6 +626,7 @@ document.addEventListener('alpine:init', () => {
                         source: 'sample',
                         amount: 'sample',
                         received_from: 'sample',
+                        incomeSource: this.incomeSource,
                         description: 'sample',
                         date_received: 'sample',
                         year: this.incomeYear,
@@ -748,6 +782,7 @@ document.addEventListener('alpine:init', () => {
                             date_expensed: this.date_expensed,
                             year: this.expenseYear,
                             month: this.expenseMonth,
+                            expenseSource: this.expenseSource,
                             mode: this.exmode
                         })
                     });
@@ -780,6 +815,7 @@ document.addEventListener('alpine:init', () => {
                             amount: this.amount,
                             received_from: this.received_from,
                             description: this.description,
+                            incomeSource: this.incomeSource,
                             date_received: this.date_received,
                             year: this.incomeYear,
                             month: this.incomeMonth,

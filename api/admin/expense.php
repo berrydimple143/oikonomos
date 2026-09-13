@@ -31,14 +31,15 @@
         $data['receipt_number'] = $input->receipt_number;
 		$data['year'] = $input->year;
 		$data['month'] = $input->month;
+		$data['expenseSource'] = $input->expenseSource;
 
 		$controller = new ExpensesController();
         if($mode == 'add' || $mode == 'edit') {
             $info = $controller->store($data);
 		} elseif($mode == 'getAll') {
-			$info = $controller->getExpenses($input->user_id, $input->year, $input->month);
+			$info = $controller->getExpenses($input->user_id, $input->year, $input->month, $input->expenseSource);
 		} elseif($mode == 'delete') {
-			$info = $controller->deleteData($input->id, $input->user_id, $input->year, $input->month);
+			$info = $controller->deleteData($input->id, $input->user_id, $input->year, $input->month, $input->expenseSource);
 		} elseif($mode == 'search') {
 			$info = $controller->getData($input->id);
 		} elseif($mode == 'change') {

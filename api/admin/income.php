@@ -30,14 +30,15 @@
 		$data['description'] = $input->description;
 		$data['year'] = $input->year;
 		$data['month'] = $input->month;
+		$data['incomeSource'] = $input->incomeSource;
 
 		$controller = new IncomeController();
         if($mode == 'add' || $mode == 'edit') {
             $info = $controller->store($data);
 		} elseif($mode == 'getAll') {
-			$info = $controller->getIncomes($input->user_id, $input->year, $input->month);
+			$info = $controller->getIncomes($input->user_id, $input->year, $input->month, $input->incomeSource);
 		} elseif($mode == 'delete') {
-			$info = $controller->deleteData($input->id, $input->user_id, $input->year, $input->month);
+			$info = $controller->deleteData($input->id, $input->user_id, $input->year, $input->month, $input->incomeSource);
 		} elseif($mode == 'search') {
 			$info = $controller->getData($input->id);
 		} elseif($mode == 'change') {

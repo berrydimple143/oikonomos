@@ -24,7 +24,7 @@
           <li class="p-1 hover:bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 hover:p-1 hover:rounded-full" :class="(page === '') ? 'bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 p-1 rounded-full' : ''">
             <a @click.prevent="navigate('')" class="menu-item group flex items-center justify-start space-x-2 cursor-pointer">
               
-            <?php includeWithArgs('../images/icons/dashboard.php', ['color' => '#fff', 'class' => 'w-7 h-7', 'view' => '0 0 24 24']); ?>
+            <?php includeWithArgs('../images/icons/dashboard.php', ['color' => '#fff', 'class' => 'w-5 h-5', 'view' => '0 0 24 24']); ?>
 
               <span
                 class="menu-item-text"
@@ -38,7 +38,7 @@
 
           <li class="p-1 hover:bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 hover:p-1 hover:rounded-full" :class="(page === 'income' || page === 'income_form') ? 'bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 p-1 rounded-full' : ''">
             <a @click.prevent="navigate('income')" class="menu-item group flex items-center justify-start space-x-2 cursor-pointer">
-              <?php includeWithArgs('../images/icons/work.php', ['color' => '#fff', 'class' => 'w-5 h-5', 'view' => '0 0 60 60']); ?>
+              <?php includeWithArgs('../images/icons/income.php', ['color' => '#fff', 'class' => 'w-5 h-5', 'view' => '0 0 1024 1024']); ?>
               <span
                 class="menu-item-text"
                 :class="sidebarToggle ? 'lg:hidden' : ''"
@@ -51,7 +51,7 @@
           <!-- Menu Item Profile -->
           <li class="p-1 hover:bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 hover:p-1 hover:rounded-full" :class="(page === 'expense' || page === 'expense_form') ? 'bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 p-1 rounded-full' : ''">
             <a @click.prevent="navigate('expense')" class="menu-item group flex items-center justify-start space-x-2 cursor-pointer">
-              <?php includeWithArgs('../images/icons/experience.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 512 512']); ?>
+              <?php includeWithArgs('../images/icons/expense.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 48 48']); ?>
               <span
                 class="menu-item-text"
                 :class="sidebarToggle ? 'lg:hidden' : ''"
@@ -63,7 +63,7 @@
 
           <li class="p-1 hover:bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 hover:p-1 hover:rounded-full" :class="(page === 'attendance' || page === 'attendance_form') ? 'bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 p-1 rounded-full' : ''">
             <a @click.prevent="navigate('attendance')" class="menu-item group flex items-center justify-start space-x-2 cursor-pointer">
-              <?php includeWithArgs('../images/icons/experience.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 512 512']); ?>
+              <?php includeWithArgs('../images/icons/attendance.php', ['color' => '#fff', 'class' => 'w-4 h-4', 'view' => '0 0 24 24']); ?>
               <span
                 class="menu-item-text"
                 :class="sidebarToggle ? 'lg:hidden' : ''"
@@ -75,7 +75,7 @@
 
           <li class="p-1 hover:bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 hover:p-1 hover:rounded-full" :class="(page === 'projection' || page === 'projection_form') ? 'bg-gradient-to-t from-slate-500 via-slate-700 to-slate-300 p-1 rounded-full' : ''">
             <a @click.prevent="navigate('projection')" class="menu-item group flex items-center justify-start space-x-2 cursor-pointer">
-              <?php includeWithArgs('../images/icons/experience.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 512 512']); ?>
+              <?php includeWithArgs('../images/icons/projection.php', ['color' => '#fff', 'class' => 'w-4 h-4', 'view' => '0 0 470 470']); ?>
               <span
                 class="menu-item-text"
                 :class="sidebarToggle ? 'lg:hidden' : ''"

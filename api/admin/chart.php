@@ -104,9 +104,16 @@
         $decAttendance = $decAttendance['total_attendance'] ?? 0;
         $totalAttendance = $janAttendance + $febAttendance + $marAttendance + $aprAttendance + $mayAttendance + $junAttendance + $julAttendance + $augAttendance + $sepAttendance + $octAttendance + $novAttendance + $decAttendance;
 
-        $results = [$janIncome, $febIncome, $marIncome, $aprIncome, $mayIncome, $junIncome, $julIncome, $augIncome, $sepIncome, $octIncome, $novIncome, $decIncome, $janExpense, $febExpense, $marExpense, $aprExpense, $mayExpense, $junExpense, $julExpense, $augExpense, $sepExpense, $octExpense, $novExpense, $decExpense, $janAttendance, $febAttendance, $marAttendance, $aprAttendance, $mayAttendance, $junAttendance, $julAttendance, $augAttendance, $sepAttendance, $octAttendance, $novAttendance, $decAttendance];
-        $maxValue = max($results);        
-            
+        $results = [$janIncome, $febIncome, $marIncome, $aprIncome, $mayIncome, $junIncome, $julIncome, $augIncome, $sepIncome, $octIncome, $novIncome, $decIncome, $janExpense, $febExpense, $marExpense, $aprExpense, $mayExpense, $junExpense, $julExpense, $augExpense, $sepExpense, $octExpense, $novExpense, $decExpense, $janAttendance, $febAttendance, $marAttendance, $aprAttendance, $mayAttendance, $junAttendance, $julAttendance, $augAttendance, $sepAttendance, $octAttendance, $novAttendance, $decAttendance];        
+        $incomeResult = [$janIncome, $febIncome, $marIncome, $aprIncome, $mayIncome, $junIncome, $julIncome, $augIncome, $sepIncome, $octIncome, $novIncome, $decIncome];        
+        $expenseResult = [$janExpense, $febExpense, $marExpense, $aprExpense, $mayExpense, $junExpense, $julExpense, $augExpense, $sepExpense, $octExpense, $novExpense, $decExpense];
+        $attendanceResult = [$janAttendance, $febAttendance, $marAttendance, $aprAttendance, $mayAttendance, $junAttendance, $julAttendance, $augAttendance, $sepAttendance, $octAttendance, $novAttendance, $decAttendance];
+
+        $maxValue = max($results);
+        $maxValueOfIncome = max($incomeResult);
+        $maxValueOfExpense = max($expenseResult);
+        $maxValueOfAttendance = max($attendanceResult);
+
             $allWeeks = [];            
             for($k = 1; $k <= 12; $k++) {         
 
@@ -116,14 +123,19 @@
                     $janWeeks = [];
                     $i = 1;
                     $maxValue1 = 0;
+                    
                     $totalJanIncome = $totalJanExpense = $totalAttendance = [];
 
                     foreach($janDataPerWeek["weeks"] as $wk) {
                         $before = (string)$wk['start_date'] . " 00:00:00";
                         $after = (string)$wk['last_day'] . " 23:59:59";
                         $janIncPW = $income->getIncomePerWeek($before, $after, $uid);
+                        $dates_received = $janIncPW['dates_received'];
+                        $amounts = $janIncPW['amounts'];
+                        $sources = $janIncPW['sources'];
+                        $recipients = $janIncPW['recipients'];
                         $janIncPW = $janIncPW['total_amount'] ?? 0;
-                        $totalJanIncome[] = $janIncPW;
+                        $totalJanIncome[] = $janIncPW;                        
                         
                         $janExpPW = $expense->getExpensePerWeek($before, $after, $uid);
                         $janExpPW = $janExpPW['total_amount'] ?? 0;
@@ -131,15 +143,22 @@
 
                         $attendancePerWeek = $attendance->getAttendancePerWeek($before, $after, $uid);
                         $attendancePerWeek = $attendancePerWeek['total_attendance'] ?? 0;
-                        $totalAttendance[] = $attendancePerWeek;
+                        $totalAttendance[] = $attendancePerWeek;                  
 
                         $max = max([$janIncPW, $janExpPW, $attendancePerWeek]);
                         if($maxValue1 < $max) {
                             $maxValue1 = $max;
-                        }                                        
+                        }
 
                         $janWeeks[] = (object)[              
                             "maxValue" => $maxValue1, 
+                            "maxValueOfIncome" => max($totalJanIncome),
+                            "maxValueOfExpense" => max($totalJanExpense),
+                            "maxValueOfAttendance" => max($totalAttendance),
+                            "dates_received" => $dates_received,
+                            "amounts" => $amounts,
+                            "sources" => $sources,
+                            "recipients" => $recipients,
                             "month" => "Week " . $i,
                             "total_income" => array_sum($totalJanIncome),
                             "total_expense" => array_sum($totalJanExpense),
@@ -231,6 +250,9 @@
         $defaultData = [
             (object)[
                 "maxValue" => $maxValue,
+                "maxValueOfIncome" => $maxValueOfIncome,
+                "maxValueOfExpense" => $maxValueOfExpense,
+                "maxValueOfAttendance" => $maxValueOfAttendance,
                 "total_income" => $totalIncome,
                 "total_expense" => $totalExpenses,     
                 "total_attendance" => $totalAttendance,           
@@ -258,6 +280,9 @@
             ],
             (object)[
                 "maxValue" => $maxValue,
+                "maxValueOfIncome" => $maxValueOfIncome,
+                "maxValueOfExpense" => $maxValueOfExpense,
+                "maxValueOfAttendance" => $maxValueOfAttendance,
                 "total_income" => $totalIncome,
                 "total_expense" => $totalExpenses,
                 "total_attendance" => $totalAttendance,

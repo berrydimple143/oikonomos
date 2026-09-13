@@ -6,48 +6,55 @@
         class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between"
     >
         <div class="flex flex-wrap items-center justify-center gap-2">
-            <h3 class="text-2xl font-semibold text-gray-300 dark:text-white/90">
+            <h3 class="text-lg font-semibold text-gray-300 dark:text-white/90">
                 List of Expenses
             </h3>
-            <select @change.prevent="initExpenses" name="expenseYear" id="expenseYear" x-model="expenseYear" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5  cursor-pointer" placeholder="Select year here">
+            <select @change.prevent="initExpenses" name="expenseYear" id="expenseYear" x-model="expenseYear" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-3 py-0.5  cursor-pointer" placeholder="Select year here">
                 <template x-for="yr in yearSelection" :key="yr">
                     <option class="text-gray-800" :value="yr" x-text="yr"></option>
                 </template>
             </select>
-            <select @change.prevent="initExpenses" name="expenseMonth" id="expenseMonth" x-model="expenseMonth" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5 cursor-pointer" placeholder="Select month here">
+            <select @change.prevent="initExpenses" name="expenseMonth" id="expenseMonth" x-model="expenseMonth" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-3 py-0.5 cursor-pointer" placeholder="Select month here">
                 <option class="text-gray-800" value="">All Months</option>
                 <template x-for="item in graphSelection" :key="item.month">
                     <option class="text-gray-800" :value="item.month" x-text="item.month"></option>
                 </template>
             </select>
+            <select @change.prevent="initExpenses" name="expenseSource" id="expenseSource" x-model="expenseSource" class="inline-flex items-center text-white border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-3 py-0.5 cursor-pointer" placeholder="Select source here">
+                <option class="text-gray-800" value="">All Items</option>
+                <template x-for="src in expenseSources" :key="src">
+                    <option class="text-gray-800" :value="src" x-text="src"></option>
+                </template>
+            </select>
         </div>
 
-        <div class="flex items-center gap-3">
-        
+        <div class="flex items-center gap-3">       
+
         <div class="relative">
-            <span class="absolute top-1/2 left-4 -translate-y-1/2 hover:cursor-pointer">
+            <span class="absolute top-1/2 left-2 -translate-y-1/2 hover:cursor-pointer">
               
                 <?php includeWithArgs('../images/icons/magnify.php', ['color' => '#fff', 'class' => 'w-4 h-4', 'view' => '0 0 20 20']); ?>
 
             </span>
             <input
-            type="text"
-            placeholder="Search here ..."
-            id="search-input" 
-            x-model="xsearchQuery" 
-            @input="xcurrentPage = 1"  
-            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-100 focus:ring-brand-200/10 dark:focus:border-brand-400 h-9 w-full rounded-lg border border-gray-200 bg-transparent py-2.0 pr-14 pl-12 text-sm text-white placeholder:text-white focus:ring-1 focus:outline-hidden lg:w-[350px] dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30"
-        />
+                type="text"
+                placeholder="Search here ..."
+                id="search-input" 
+                x-model="xsearchQuery" 
+                @input="xcurrentPage = 1"  
+                class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-100 focus:ring-brand-200/10 dark:focus:border-brand-400 h-8 w-full rounded-lg border border-gray-200 bg-transparent py-1.5 pr-14 pl-8 text-sm text-white placeholder:text-white focus:ring-1 focus:outline-hidden lg:w-[250px] dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30"
+            />
 
-        <button
-            id="search-button"             
-            class="absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-md border border-gray-200 bg-transparent px-[5px] py-[2.5px] text-xs -tracking-[0.2px] text-white dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
-        >
-            <span> ⌘ </span>
-            <span> F </span>
-        </button>
-        </div>        
-        <button @click.prevent="navigate('expense_form')" type="button" class="inline-flex items-center  text-[#04ea13] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-4 py-1.5  cursor-pointer">                                
+            <button
+                id="search-button"             
+                class="absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-md border border-gray-200 bg-transparent px-[3px] py-[1.5px] text-xs -tracking-[0.2px] text-white dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
+            >
+                <span>⌘</span>
+                <span>F</span>
+            </button>
+        </div>  
+
+        <button @click.prevent="navigate('expense_form')" type="button" class="inline-flex items-center  text-[#04ea13] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-md text-sm px-3 py-0.5  cursor-pointer">                                
             <?php includeWithArgs('../images/icons/add.php', ['color' => '#04ea13', 'class' => 'w-4 h-4 mr-1', 'view' => '0 0 24 24']); ?>
                 ADD EXPENSE
             </button>

@@ -13,7 +13,7 @@
 			return $expense->fetch();
 		}
 
-		public static function getExpenses($uid, $year, $month) {
+		public static function getExpenses($uid, $year, $month, $expenseSource) {
 			if(empty($month)) {
 				$from = $year."-01-01 00:00:00";
 				$to = $year."-12-31 23:59:59";
@@ -22,9 +22,13 @@
 				$day = Utilities::getLastDaysOfYearMonth($year, $m[1]);							
 				$from = $year."-".$m[0]."-01 00:00:00";
 				$to = $year."-".$m[0]."-".$day." 23:59:59";
-			}			
+			}		
+			$src = "";
+			if(!empty($expenseSource)) {
+				$src = " AND asset='$expenseSource'";
+			}	
 			$pdo = Database::connect();
-			$expenses = $pdo->query("SELECT id, user_id, asset, description, amount, status, received_by, receipt_number, date_expensed, DATE_FORMAT(date_expensed, '%M %d, %Y') AS expensed_on, created_at FROM expenses WHERE user_id=$uid AND date_expensed >= '$from' AND date_expensed <= '$to' ORDER BY created_at DESC");
+			$expenses = $pdo->query("SELECT id, user_id, asset, description, amount, status, received_by, receipt_number, date_expensed, DATE_FORMAT(date_expensed, '%M %d, %Y') AS expensed_on, created_at FROM expenses WHERE user_id=$uid AND date_expensed >= '$from' AND date_expensed <= '$to' $src ORDER BY created_at DESC");
 			return $expenses->fetchAll(PDO::FETCH_ASSOC);
 		}
 
@@ -41,7 +45,7 @@
 			return $experience->execute([$status, $updated_at, $id]);
 		}
 
-		public static function create($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $year, $month) {
+		public static function create($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $year, $month, $expenseSource) {
 			$pdo = Database::connect();
 			$experience = $pdo->prepare("INSERT INTO expenses(user_id, asset, amount, received_by, date_expensed, description, receipt_number) VALUES(:user_id, :asset, :amount, :received_by, :date_expensed, :description, :receipt_number)");
 			$inserted = $experience->execute([
@@ -55,30 +59,30 @@
 			]);
 
 			if($inserted) {				
-				return self::getExpenses($user_id, $year, $month);
+				return self::getExpenses($user_id, $year, $month, $expenseSource);
 			} else {
 				return false;
 			}
 		}
 
-		public static function update($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $year, $month, $id) {
+		public static function update($user_id, $asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $year, $month, $expenseSource, $id) {
 			$pdo = Database::connect();
 			$updated_at = date('Y-m-d H:i:s');
 			$expense = $pdo->prepare("UPDATE expenses SET asset=?, amount=?, received_by=?, date_expensed=?, description=?, receipt_number=?, updated_at=? WHERE id=?");
 			 $updated = $expense->execute([$asset, $amount, $received_by, $date_expensed, $description, $receipt_number, $updated_at, $id]);				
 			 if($updated) {
-				return self::getExpenses($user_id, $year, $month);
+				return self::getExpenses($user_id, $year, $month, $expenseSource);
 			 } else {
 				return false;
 			 }
 		}
 
-		public static function delete($id, $uid, $year, $month) {
+		public static function delete($id, $uid, $year, $month, $expenseSource) {
 			$pdo = Database::connect();
 			$expense = $pdo->prepare("DELETE FROM expenses WHERE id=?");
 			$deleted = $expense->execute([$id]);	
 			if($deleted) {
-				return self::getExpenses($uid, $year, $month);
+				return self::getExpenses($uid, $year, $month, $expenseSource);
 			} else {
 				return false;
 			}

@@ -10,16 +10,16 @@
 			return Income::getProject($id);
 		}
 
-		public function deleteData($id, $uid, $year, $month) {
-			return Income::delete($id, $uid, $year, $month);
+		public function deleteData($id, $uid, $year, $month, $incomeSource) {
+			return Income::delete($id, $uid, $year, $month, $incomeSource);
 		}
 
 		public function changeStatus($id, $status) {
 			return Income::changeStatus($id, $status);					
 		}
 
-		public function getIncomes($uid, $year, $month) {
-			return Income::getIncomes($uid, $year, $month);
+		public function getIncomes($uid, $year, $month, $incomeSource) {
+			return Income::getIncomes($uid, $year, $month, $incomeSource);
 		}
 
 		private function lastDay($year, $month) {
@@ -49,32 +49,25 @@
 			$description = trim(htmlspecialchars($data['description']));
 			$year = trim(htmlspecialchars($data['year']));
 			$month = trim(htmlspecialchars($data['month']));
+			$incomeSource = trim(htmlspecialchars($data['incomeSource']));
 			$mode = trim(htmlspecialchars($data['mode']));
 
 			if($source AND $amount) {
 				if($mode == "add") {
-					$inserted = Income::create($user_id, $source, $amount, $received_from, $date_received, $description, $year, $month);
+					$inserted = Income::create($user_id, $source, $amount, $received_from, $date_received, $description, $year, $month, $incomeSource);
 					if($inserted) {
 						return $inserted;
 					} else {
 						return false;
 					}
 				} elseif($mode == "edit") {
-					$updated = Income::update($user_id, $source, $amount, $received_from, $date_received, $description, $year, $month, $id);
+					$updated = Income::update($user_id, $source, $amount, $received_from, $date_received, $description, $year, $month, $incomeSource, $id);
 					if($updated) {
 						return $updated;
 					} else {
 						return false;
 					}
 				}				
-			}
-		}
-
-		private function isExisting($title, $description) {
-			if(Income::findUserByFields($title, $description)) {
-				return true;
-			} else {
-				return false;
 			}
 		}
 	}
