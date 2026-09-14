@@ -13,7 +13,6 @@
         $attendance = new AttendanceController();
         $info = json_decode(file_get_contents("php://input"));
         $year = (string)$info->year;
-        //$year = (string)date('Y');
         $uid = $info->user_id;
         $selectedMonth = $info->selectedMonth;
         if(empty($uid) && empty($year)) {
@@ -24,57 +23,57 @@
             exit();
         }
         // Incomes
-        $janIncome = $income->getIncomePerMonth($year, '01', $uid);
-        $febIncome = $income->getIncomePerMonth($year, '02', $uid);
-        $marIncome = $income->getIncomePerMonth($year, '03', $uid);
-        $aprIncome = $income->getIncomePerMonth($year, '04', $uid);  
-        $mayIncome = $income->getIncomePerMonth($year, '05', $uid);
-        $junIncome = $income->getIncomePerMonth($year, '06', $uid);
-        $julIncome = $income->getIncomePerMonth($year, '07', $uid);
-        $augIncome = $income->getIncomePerMonth($year, '08', $uid);
-        $sepIncome = $income->getIncomePerMonth($year, '09', $uid);
-        $octIncome = $income->getIncomePerMonth($year, '10', $uid);
-        $novIncome = $income->getIncomePerMonth($year, '11', $uid);
-        $decIncome = $income->getIncomePerMonth($year, '12', $uid);
-        $janIncome = $janIncome['total_amount'] ?? 0;
-        $febIncome = $febIncome['total_amount'] ?? 0;
-        $marIncome = $marIncome['total_amount'] ?? 0;
-        $aprIncome = $aprIncome['total_amount'] ?? 0;
-        $mayIncome = $mayIncome['total_amount'] ?? 0;
-        $junIncome = $junIncome['total_amount'] ?? 0;
-        $julIncome = $julIncome['total_amount'] ?? 0;
-        $augIncome = $augIncome['total_amount'] ?? 0;
-        $sepIncome = $sepIncome['total_amount'] ?? 0;
-        $octIncome = $octIncome['total_amount'] ?? 0;
-        $novIncome = $novIncome['total_amount'] ?? 0;
-        $decIncome = $decIncome['total_amount'] ?? 0;
+        $janIncome = $janIncome1 = $income->getIncomePerMonth($year, '01', $uid);
+        $febIncome = $febIncome1 = $income->getIncomePerMonth($year, '02', $uid);
+        $marIncome = $marIncome1 = $income->getIncomePerMonth($year, '03', $uid);
+        $aprIncome = $aprIncome1 = $income->getIncomePerMonth($year, '04', $uid);  
+        $mayIncome = $mayIncome1 = $income->getIncomePerMonth($year, '05', $uid);
+        $junIncome = $junIncome1 = $income->getIncomePerMonth($year, '06', $uid);
+        $julIncome = $julIncome1 = $income->getIncomePerMonth($year, '07', $uid);
+        $augIncome = $augIncome1 = $income->getIncomePerMonth($year, '08', $uid);
+        $sepIncome = $sepIncome1 = $income->getIncomePerMonth($year, '09', $uid);
+        $octIncome = $octIncome1 = $income->getIncomePerMonth($year, '10', $uid);
+        $novIncome = $novIncome1 = $income->getIncomePerMonth($year, '11', $uid);
+        $decIncome = $decIncome1 = $income->getIncomePerMonth($year, '12', $uid);
+        $janIncome = $janIncome->total_amount ?? 0;
+        $febIncome = $febIncome->total_amount ?? 0;
+        $marIncome = $marIncome->total_amount ?? 0;
+        $aprIncome = $aprIncome->total_amount ?? 0;
+        $mayIncome = $mayIncome->total_amount ?? 0;
+        $junIncome = $junIncome->total_amount ?? 0;
+        $julIncome = $julIncome->total_amount ?? 0;
+        $augIncome = $augIncome->total_amount ?? 0;
+        $sepIncome = $sepIncome->total_amount ?? 0;
+        $octIncome = $octIncome->total_amount ?? 0;
+        $novIncome = $novIncome->total_amount ?? 0;
+        $decIncome = $decIncome->total_amount ?? 0;
         $totalIncome = $janIncome + $febIncome + $marIncome + $aprIncome + $mayIncome + $junIncome + $julIncome + $augIncome + $sepIncome + $octIncome + $novIncome + $decIncome;
 
         // Expenses
-        $janExpense = $expense->getExpensePerMonth($year, '01', $uid);
-        $febExpense = $expense->getExpensePerMonth($year, '02', $uid);
-        $marExpense = $expense->getExpensePerMonth($year, '03', $uid);
-        $aprExpense = $expense->getExpensePerMonth($year, '04', $uid);  
-        $mayExpense = $expense->getExpensePerMonth($year, '05', $uid);
-        $junExpense = $expense->getExpensePerMonth($year, '06', $uid);
-        $julExpense = $expense->getExpensePerMonth($year, '07', $uid);
-        $augExpense = $expense->getExpensePerMonth($year, '08', $uid);
-        $sepExpense = $expense->getExpensePerMonth($year, '09', $uid);
-        $octExpense = $expense->getExpensePerMonth($year, '10', $uid);
-        $novExpense = $expense->getExpensePerMonth($year, '11', $uid);
-        $decExpense = $expense->getExpensePerMonth($year, '12', $uid);
-        $janExpense = $janExpense['total_amount'] ?? 0;
-        $febExpense = $febExpense['total_amount'] ?? 0;
-        $marExpense = $marExpense['total_amount'] ?? 0;
-        $aprExpense = $aprExpense['total_amount'] ?? 0;
-        $mayExpense = $mayExpense['total_amount'] ?? 0;
-        $junExpense = $junExpense['total_amount'] ?? 0;
-        $julExpense = $julExpense['total_amount'] ?? 0;
-        $augExpense = $augExpense['total_amount'] ?? 0;
-        $sepExpense = $sepExpense['total_amount'] ?? 0;
-        $octExpense = $octExpense['total_amount'] ?? 0;
-        $novExpense = $novExpense['total_amount'] ?? 0;
-        $decExpense = $decExpense['total_amount'] ?? 0;
+        $janExpense = $janExpense1 = $expense->getExpensePerMonth($year, '01', $uid);
+        $febExpense = $febExpense1 = $expense->getExpensePerMonth($year, '02', $uid);
+        $marExpense = $marExpense1 = $expense->getExpensePerMonth($year, '03', $uid);
+        $aprExpense = $aprExpense1 = $expense->getExpensePerMonth($year, '04', $uid);  
+        $mayExpense = $mayExpense1 = $expense->getExpensePerMonth($year, '05', $uid);
+        $junExpense = $junExpense1 = $expense->getExpensePerMonth($year, '06', $uid);
+        $julExpense = $julExpense1 = $expense->getExpensePerMonth($year, '07', $uid);
+        $augExpense = $augExpense1 = $expense->getExpensePerMonth($year, '08', $uid);
+        $sepExpense = $sepExpense1 = $expense->getExpensePerMonth($year, '09', $uid);
+        $octExpense = $octExpense1 = $expense->getExpensePerMonth($year, '10', $uid);
+        $novExpense = $novExpense1 = $expense->getExpensePerMonth($year, '11', $uid);
+        $decExpense = $decExpense1 = $expense->getExpensePerMonth($year, '12', $uid);
+        $janExpense = $janExpense->total_amount ?? 0;
+        $febExpense = $febExpense->total_amount ?? 0;
+        $marExpense = $marExpense->total_amount ?? 0;
+        $aprExpense = $aprExpense->total_amount ?? 0;
+        $mayExpense = $mayExpense->total_amount ?? 0;
+        $junExpense = $junExpense->total_amount ?? 0;
+        $julExpense = $julExpense->total_amount ?? 0;
+        $augExpense = $augExpense->total_amount ?? 0;
+        $sepExpense = $sepExpense->total_amount ?? 0;
+        $octExpense = $octExpense->total_amount ?? 0;
+        $novExpense = $novExpense->total_amount ?? 0;
+        $decExpense = $decExpense->total_amount ?? 0;
         $totalExpenses = $janExpense + $febExpense + $marExpense + $aprExpense + $mayExpense + $junExpense + $julExpense + $augExpense + $sepExpense + $octExpense + $novExpense + $decExpense;
 
         // Attendance
@@ -123,22 +122,20 @@
                     $janWeeks = [];
                     $i = 1;
                     $maxValue1 = 0;
-                    
+                    $details = [];
                     $totalJanIncome = $totalJanExpense = $totalAttendance = [];
 
                     foreach($janDataPerWeek["weeks"] as $wk) {
                         $before = (string)$wk['start_date'] . " 00:00:00";
                         $after = (string)$wk['last_day'] . " 23:59:59";
-                        $janIncPW = $income->getIncomePerWeek($before, $after, $uid);
-                        $dates_received = $janIncPW['dates_received'];
-                        $amounts = $janIncPW['amounts'];
-                        $sources = $janIncPW['sources'];
-                        $recipients = $janIncPW['recipients'];
-                        $janIncPW = $janIncPW['total_amount'] ?? 0;
+                        $janIncPW = $income->getIncomePerWeek($before, $after, $uid);   
+                        $details[] = $janIncPW;                         
+
+                        $janIncPW = $janIncPW->total_amount ?? 0;
                         $totalJanIncome[] = $janIncPW;                        
                         
                         $janExpPW = $expense->getExpensePerWeek($before, $after, $uid);
-                        $janExpPW = $janExpPW['total_amount'] ?? 0;
+                        $janExpPW = $janExpPW->total_amount ?? 0;
                         $totalJanExpense[] = $janExpPW;
 
                         $attendancePerWeek = $attendance->getAttendancePerWeek($before, $after, $uid);
@@ -155,10 +152,7 @@
                             "maxValueOfIncome" => max($totalJanIncome),
                             "maxValueOfExpense" => max($totalJanExpense),
                             "maxValueOfAttendance" => max($totalAttendance),
-                            "dates_received" => $dates_received,
-                            "amounts" => $amounts,
-                            "sources" => $sources,
-                            "recipients" => $recipients,
+                            "details" => $details,                            
                             "month" => "Week " . $i,
                             "total_income" => array_sum($totalJanIncome),
                             "total_expense" => array_sum($totalJanExpense),
@@ -206,9 +200,9 @@
                     //     $k = '0'.(string)$k;
                     // }
                     // $janIncome = $income->getIncomePerMonth($year, $k, $uid);
-                    // $janIncome = $janIncome['total_amount'] ?? 0;
+                    // $janIncome = $janIncome->total_amount ?? 0;
                     // $janExpense = $expense->getExpensePerMonth($year, $k, $uid);
-                    // $janExpense = $janExpense['total_amount'] ?? 0;
+                    // $janExpense = $janExpense->total_amount ?? 0;
                     // $maxResult = [$janIncome, $janExpense];
                     
 
@@ -255,18 +249,21 @@
                 "maxValueOfAttendance" => $maxValueOfAttendance,
                 "total_income" => $totalIncome,
                 "total_expense" => $totalExpenses,     
-                "total_attendance" => $totalAttendance,           
+                "total_attendance" => $totalAttendance,               
                 "month" => "Jan",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
+                        "year" => $year,  
                         "value" => $janIncome, 
+                        "details" => $janIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857"
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $janExpense, 
+                        "details" => $janExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -285,18 +282,21 @@
                 "maxValueOfAttendance" => $maxValueOfAttendance,
                 "total_income" => $totalIncome,
                 "total_expense" => $totalExpenses,
-                "total_attendance" => $totalAttendance,
+                "total_attendance" => $totalAttendance,                
                 "month" => "Feb",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
+                        "year" => $year,  
                         "value" => $febIncome, 
+                        "details" => $febIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $febExpense, 
+                        "details" => $febExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -312,18 +312,21 @@
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
                 "total_expense" => $totalExpenses,
-                "total_attendance" => $totalAttendance,
+                "total_attendance" => $totalAttendance,                
                 "month" => "Mar",                
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $marIncome, 
+                        "year" => $year,  
+                        "details" => $marIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $marExpense, 
+                        "details" => $marExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -339,17 +342,21 @@
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
                 "total_expense" => $totalExpenses,
+                "total_attendance" => $totalAttendance,                
                 "month" => "Apr",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $aprIncome, 
+                        "year" => $year,  
+                        "details" => $aprIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $aprExpense, 
+                        "details" => $aprExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -364,18 +371,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                      
                 "month" => "May",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $mayIncome, 
+                        "year" => $year,           
+                        "details" => $mayIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $mayExpense, 
+                        "details" => $mayExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -390,18 +400,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                
                 "month" => "Jun",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $junIncome, 
+                        "year" => $year,  
+                        "details" => $junIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $junExpense, 
+                        "details" => $junExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -416,18 +429,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                
                 "month" => "Jul",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $julIncome, 
+                        "year" => $year,  
+                        "details" => $julIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $julExpense, 
+                        "details" => $julExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -442,18 +458,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                 
                 "month" => "Aug",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $augIncome, 
+                        "year" => $year, 
+                        "details" => $augIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $augExpense, 
+                        "details" => $augExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -468,18 +487,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                
                 "month" => "Sep",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $sepIncome, 
+                        "year" => $year,  
+                        "details" => $sepIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $sepExpense, 
+                        "details" => $sepExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -494,18 +516,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                      
                 "month" => "Oct",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $octIncome, 
+                        "year" => $year,  
+                        "details" => $octIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $octExpense, 
+                        "details" => $octExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -520,18 +545,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                    
                 "month" => "Nov",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $novIncome, 
+                        "year" => $year,  
+                        "details" => $novIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $novExpense, 
+                        "details" => $novExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
@@ -546,18 +574,21 @@
             (object)[
                 "maxValue" => $maxValue,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,
+                "total_expense" => $totalExpenses,                      
                 "month" => "Dec",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
                         "value" => $decIncome, 
+                        "year" => $year,    
+                        "details" => $decIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
                     (object)[
                         "label" => "Expenses", 
                         "value" => $decExpense, 
+                        "details" => $decExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],

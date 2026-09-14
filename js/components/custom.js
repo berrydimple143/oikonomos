@@ -31,6 +31,7 @@ document.addEventListener('alpine:init', () => {
         inmode: 'add',
         incomeModal: null,
         viewIncomeModal: null,
+        viewIncomeDetails: null,
         incomeAPI: '../api/admin/income.php',
         //incomeCounterAPI: '../api/admin/countIncome.php',
         incomeTotal: 0,
@@ -114,8 +115,69 @@ document.addEventListener('alpine:init', () => {
             { abbr: 'Nov', month: 'November' },
             { abbr: 'Dec', month: 'December' }
         ],
-        yearSelection: [],                
+        yearSelection: [],        
+        incomeDetails: [],
+        expenseDetails: [],
+        infoTitle: "Month Here",
+        incomeDetailsTotal: 0,
 
+        showDetails(dt) {            
+            if(dt.label == "Income") {
+                this.infoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Income Details`;
+                let len = 1;
+                let arrSources = arrDates = arrAmounts = arrRecipients = [];                
+                if(dt.details.sources.includes(",")) {
+                    arrSources = dt.details.sources.split(",");       
+                    len = arrSources.length;             
+                } else {
+                    arrSources = dt.details.sources;
+                }
+                if(dt.details.dates_received.includes(",")) {
+                    arrDates = dt.details.dates_received.split(",");                    
+                } else {
+                    arrDates = dt.details.dates_received;
+                }
+                if(dt.details.amounts.includes(",")) {
+                    arrAmounts = dt.details.amounts.split(",");
+                    arrAmounts = arrAmounts.map(amt => {
+                        return parseFloat(amt);
+                    });
+                    this.incomeDetailsTotal = currencyFormatter(array_sum(arrAmounts), 'PHP');
+                } else {
+                    arrAmounts = dt.details.amounts;
+                    this.incomeDetailsTotal = currencyFormatter(arrAmounts, 'PHP');
+                }
+                if(dt.details.recipients.includes(",")) {
+                    arrRecipients = dt.details.recipients.split(",");                    
+                } else {
+                    arrRecipients = dt.details.recipients;
+                }
+                for(let i=0; i < len; i++) {
+                    if(len > 1) {
+                        this.incomeDetails.push({ 
+                            source: arrSources[i], 
+                            date_received: dateFormat(arrDates[i]),
+                            amount: arrAmounts[i],
+                            received_from: arrRecipients[i]
+                        });
+                    } else {
+                        this.incomeDetails.push({ 
+                            source: arrSources, 
+                            date_received: dateFormat(arrDates),
+                            amount: arrAmounts,
+                            received_from: arrRecipients
+                        });
+                    }                    
+                }           
+                this.viewIncomeDetails.classList.remove('hidden');                             
+            } else {
+                this.expenseDetails = dt.details;
+            }
+        },
+        closeChartIncomeDetails() {
+            this.incomeDetails = [];
+            this.viewIncomeDetails.classList.add('hidden');
+        },
         async getRawData() {
             try {
                 let response = await fetch(this.chartDataAPI, {
@@ -128,7 +190,6 @@ document.addEventListener('alpine:init', () => {
                     })
                 });
                 this.rawData = await response.json();
-                console.log(this.rawData);
                 if (this.rawData.length > 0) {
                     let maxV = this.rawData[0].maxValue;
                     if(this.selectedMonth !== "all") {
@@ -196,6 +257,7 @@ document.addEventListener('alpine:init', () => {
         renderChart() {
             const container = this.$refs.canvas;
             container.innerHTML = '';
+            const alpineData = Alpine.$data(container);
 
             // Skip render if no labels selected
             if (this.visibleLabels.length === 0) return;
@@ -340,14 +402,7 @@ document.addEventListener('alpine:init', () => {
                 .attr('height', 0)
                 .attr('class', 'transition-opacity duration-150 hover:opacity-60 cursor-pointer')
                 .on("click", function(event, d) {
-                    // 'event' is the native DOM event object
-                    // 'd' is the specific data object tied to the clicked bar
-                    
-                    console.log("You clicked the bar for:", d.label);
-                    console.log("The associated value is:", d.value);
-                    
-                    // Example action: trigger an alert or a dynamic update
-                    alert(`Clicked ${d.label} with a value of ${d.value}`);
+                    alpineData.showDetails(d);
                 })
                 .on('mouseover', (event, d) => {
                     tooltip
@@ -894,7 +949,8 @@ document.addEventListener('alpine:init', () => {
             this.attendanceModal = document.getElementById('attendanceModal');
             this.viewIncomeModal = document.getElementById('viewIncomeModal');
             this.viewExpenseModal = document.getElementById('viewExpenseModal');    
-            this.viewAttendanceModal = document.getElementById('viewAttendanceModal');                
+            this.viewAttendanceModal = document.getElementById('viewAttendanceModal');     
+            this.viewIncomeDetails = document.getElementById('viewIncomeDetails');           
         },
         // initChart() {
         //     let grossIncome = this.grossNumber;
@@ -1238,6 +1294,47 @@ document.addEventListener('alpine:init', () => {
 
             if (end > this.attTotalPages) {
                 end = this.attTotalPages;
+                start = Math.max(1, end - this.attMaxVisibleButtons + 1);
+            }
+
+            const pages = [];
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            return pages;
+        },
+
+        // For Details
+
+        get detailsTotalPages() {
+            return Math.ceil(this.detailsFilteredItems.length / this.attPageSize);
+        },
+        get attPaginatedItems() {
+            const start = (this.attCurrentPage - 1) * this.attPageSize;
+            const end = start + this.attPageSize;
+            return this.detailsFilteredItems.slice(start, end);
+        },
+        get detailsFilteredItems() {
+            return this.attendances.filter(item => {
+                    let quantity = item.quantity.toString();
+                    return (quantity.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.classification.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.description.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.attended_on.toLowerCase().includes(this.attSearchQuery.toLowerCase()))
+            });
+        },
+        nextPage() {
+            if (this.attCurrentPage < this.detailsTotalPages) this.attCurrentPage++;
+        },
+        prevPage() {
+            if (this.attCurrentPage > 1) this.attCurrentPage--;
+        },
+        goToPage(page) {
+            this.attCurrentPage = page;
+        },
+        get attVisiblePages() {
+            let start = Math.max(1, this.attCurrentPage - Math.floor(this.attMaxVisibleButtons / 2));
+            let end = start + this.attMaxVisibleButtons - 1;
+
+            if (end > this.detailsTotalPages) {
+                end = this.detailsTotalPages;
                 start = Math.max(1, end - this.attMaxVisibleButtons + 1);
             }
 

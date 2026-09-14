@@ -26,6 +26,7 @@
         </style>
   </head>
   <body x-data="dashboardLoad">
+    <?php include('../includes/admin/modals/viewIncomeDetails.php'); ?>
     <?php include('../includes/admin/modals/incomeModal.php'); ?>
     <?php include('../includes/admin/modals/viewIncomeModal.php'); ?>
     <?php include('../includes/admin/modals/expenseModal.php'); ?>    

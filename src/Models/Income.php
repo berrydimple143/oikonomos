@@ -10,7 +10,7 @@
 		public static function getIncomeWithDates($before, $after, $uid) {
 			$pdo = Database::connect();			
 			$income = $pdo->query("SELECT SUM(amount) as total_amount, GROUP_CONCAT(date_received SEPARATOR ',') AS dates_received, GROUP_CONCAT(amount SEPARATOR ',') AS amounts, GROUP_CONCAT(source SEPARATOR ',') AS sources, GROUP_CONCAT(received_from SEPARATOR ',') AS recipients FROM incomes WHERE date_received >= '$before' AND date_received <= '$after' AND user_id = $uid GROUP BY user_id");
-			return $income->fetch();
+			return $income->fetch(PDO::FETCH_OBJ);
 		}
 
 		public static function getIncomes($uid, $year, $month, $incomeSource) {			

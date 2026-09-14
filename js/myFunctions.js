@@ -12,6 +12,16 @@ window.currencyFormatter = function(value, curr) {
     return formatter.format(value);
 };
 
+window.dateFormat = function(dt) {
+    const date = new Date(dt);
+    const fmt = new Intl.DateTimeFormat('en-US', { 
+        year: 'numeric', month: 'long', day: 'numeric' 
+    });
+    return fmt.format(date);
+    // const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    // return date.toLocaleDateString('en-US', options);
+};
+
 window.currencyFormatterWithChecking = function(value, curr, label) {
     if(label == "Attendance") {
         return value + " people";
@@ -70,7 +80,7 @@ window.initYearSelection = function(arr, from, to) {
         arr.push(i);
     }   
     return arr;
-}
+};
 
 window.getFullDateByYearMonth = function(year, month) {
     if(month == "Jan" || month == "January") {
@@ -100,4 +110,36 @@ window.getFullDateByYearMonth = function(year, month) {
     } else {
         return dateTimeNowFormatter('datetime', false, false);
     }
-}
+};
+
+window.getFullMonthWord = function(month) {
+    if(month == "Jan") {
+        return "January";
+    } else if(month == "Feb") {
+        return "February";
+    } else if(month == "Mar") {
+        return "March";
+    } else if(month == "Apr") {
+        return "April";
+    } else if(month == "May") {
+        return month;
+    } else if(month == "Jun") {
+        return "June";
+    } else if(month == "Jul") {
+        return "July";
+    } else if(month == "Aug") {
+        return "August";
+    } else if(month == "Sep") {
+        return "September";
+    } else if(month == "Oct") {
+        return "October";
+    } else if(month == "Nov") {
+        return "November";
+    } else if(month == "Dec") {
+        return "December";
+    } 
+};
+
+window.array_sum = function(numbers) {
+    return numbers.reduce((total, num) => total + num, 0);
+};
