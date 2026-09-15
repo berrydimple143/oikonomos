@@ -21,7 +21,7 @@
             <!-- table header end -->
 
             <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                <template x-for="(inc, index) in incomeDetails" :key="inc.date_received">
+                <template x-for="(inc, index) in detailsPaginatedItems" :key="inc.id">
                     <tr class="text-sm text-gray-100 text-theme-sm dark:text-white/90">
                         <td class="py-2">
                             <div class="flex items-center gap-3">
@@ -51,65 +51,65 @@
                     </tr>
                 </template>
             </tbody>          
-            <tfoot>
+            <tfoot class="border-t border-gray-100">
                 <tr>                
                     <td colspan="5">                
                         <div class="flex items-center justify-between">
                             <!-- Pagination Container -->
-                            <div class="flex items-center space-x-1 p-2 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] box-border">                    
+                            <div class="flex items-center space-x-1 p-2 bg-transparent box-border">                    
                                     <!-- Summary Information Indicator -->
                                     <span class="text-lg text-white mr-2">
-                                        Page <span class="font-semibold" x-text="currentPage"></span> of <span class="font-semibold" x-text="totalPages"></span>
+                                        Page <span class="font-semibold" x-text="detailsCurrentPage"></span> of <span class="font-semibold" x-text="detailsTotalPages"></span>
                                     </span>
                                     
                                     <!-- First & Previous Buttons -->
                                     <button 
-                                        class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold" 
-                                        @click="currentPage = 1" 
-                                        :disabled="currentPage === 1"
-                                        :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                        class="px-2.5 py-0.5 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold" 
+                                        @click="detailsCurrentPage = 1" 
+                                        :disabled="detailsCurrentPage === 1"
+                                        :class="detailsCurrentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                         «
                                     </button>
                                     <button 
-                                        class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
-                                        @click="currentPage--" 
-                                        :disabled="currentPage === 1"
-                                        :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                        class="px-2.5 py-0.5 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
+                                        @click="detailsCurrentPage--" 
+                                        :disabled="detailsCurrentPage === 1"
+                                        :class="detailsCurrentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                         ‹
                                     </button>
 
                                     <!-- Truncated Page Numbers -->
-                                    <template x-for="page in visiblePages" :key="page">
+                                    <template x-for="page in detailsVisiblePages" :key="page">
                                         <button 
-                                            class="px-3 py-1 font-bold border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border"
-                                            @click="currentPage = page" 
+                                            class="px-2.5 py-0.5 font-bold border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border"
+                                            @click="detailsCurrentPage = page" 
                                             x-text="page"
-                                            :class="currentPage === page ? 'px-4 py-2 bg-gradient-to-t from-slate-400 via-slate-600 to-slate-400 text-white' : 'text-gray-400 cursor-pointer'">
+                                            :class="detailsCurrentPage === page ? 'px-4 py-2 bg-gradient-to-t from-slate-400 via-slate-600 to-slate-400 text-white' : 'text-gray-400 cursor-pointer'">
                                         </button>
                                     </template>
 
                                     <!-- Next & Last Buttons -->
                                     <button 
-                                        class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
-                                        @click="currentPage++" 
-                                        :disabled="currentPage === totalPages"
-                                        :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                        class="px-2.5 py-0.5 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
+                                        @click="detailsCurrentPage++" 
+                                        :disabled="detailsCurrentPage === detailsTotalPages"
+                                        :class="detailsCurrentPage === detailsTotalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                         ›
                                     </button>
                                     <button 
-                                        class="px-3 py-1 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
-                                        @click="currentPage = totalPages" 
-                                        :disabled="currentPage === totalPages"
-                                        :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                        class="px-2.5 py-0.5 border border-gray-100 bg-gradient-to-t from-slate-700 via-slate-800 to-slate-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 box-border text-lg text-white font-bold"
+                                        @click="detailsCurrentPage = detailsTotalPages" 
+                                        :disabled="detailsCurrentPage === detailsTotalPages"
+                                        :class="detailsCurrentPage === detailsTotalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
                                         »
                                     </button>                    
                             </div>
                             <div class="flex items-center justify-center space-x-1">
                                 <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
-                                    Total Income: <span x-text="incomeDetailsTotal"></span>
+                                    Total: <span x-text="incomeDetailsTotal"></span>
                                 </div>
                                 <div class="p-2 bg-transparent text-white border-1 border-gray-100 box-border">
-                                    # of Entry: <span x-text="incomeDetails.length"></span>
+                                    Entry: <span x-text="incomeDetails.length"></span>
                                 </div>
                             </div>                        
                         </div>

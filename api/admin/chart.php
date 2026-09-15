@@ -263,6 +263,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $janExpense, 
+                        "year" => $year,  
                         "details" => $janExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -296,6 +297,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $febExpense, 
+                        "year" => $year,  
                         "details" => $febExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -326,6 +328,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $marExpense, 
+                        "year" => $year,  
                         "details" => $marExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -356,6 +359,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $aprExpense, 
+                        "year" => $year,  
                         "details" => $aprExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -385,6 +389,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $mayExpense, 
+                        "year" => $year,  
                         "details" => $mayExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -414,6 +419,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $junExpense, 
+                        "year" => $year,  
                         "details" => $junExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -443,6 +449,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $julExpense, 
+                        "year" => $year,  
                         "details" => $julExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -472,6 +479,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $augExpense, 
+                        "year" => $year,  
                         "details" => $augExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -501,6 +509,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $sepExpense, 
+                        "year" => $year,  
                         "details" => $sepExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -530,6 +539,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $octExpense, 
+                        "year" => $year,  
                         "details" => $octExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -559,6 +569,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $novExpense, 
+                        "year" => $year,  
                         "details" => $novExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -588,6 +599,7 @@
                     (object)[
                         "label" => "Expenses", 
                         "value" => $decExpense, 
+                        "year" => $year,  
                         "details" => $decExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 

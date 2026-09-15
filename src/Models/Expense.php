@@ -9,7 +9,7 @@
 
 		public static function getExpenseWithDates($before, $after, $uid) {
 			$pdo = Database::connect();			
-			$expense = $pdo->query("SELECT SUM(amount) as total_amount, GROUP_CONCAT(date_expensed SEPARATOR ',') AS date_expensed, GROUP_CONCAT(amount SEPARATOR ',') AS amounts, GROUP_CONCAT(asset SEPARATOR ',') AS assets, GROUP_CONCAT(received_by SEPARATOR ',') AS recipients FROM expenses WHERE date_expensed >= '$before' AND date_expensed <= '$after' AND user_id = $uid GROUP BY user_id");
+			$expense = $pdo->query("SELECT SUM(amount) as total_amount, GROUP_CONCAT(date_expensed SEPARATOR ',') AS dates_expensed, GROUP_CONCAT(amount SEPARATOR ',') AS amounts, GROUP_CONCAT(asset SEPARATOR ',') AS assets, GROUP_CONCAT(received_by SEPARATOR ',') AS recipients FROM expenses WHERE date_expensed >= '$before' AND date_expensed <= '$after' AND user_id = $uid GROUP BY user_id");
 			return $expense->fetch(PDO::FETCH_OBJ);
 		}
 

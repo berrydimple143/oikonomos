@@ -116,10 +116,22 @@ document.addEventListener('alpine:init', () => {
             { abbr: 'Dec', month: 'December' }
         ],
         yearSelection: [],        
+        viewExpenseDetails: null,
         incomeDetails: [],
-        expenseDetails: [],
         infoTitle: "Month Here",
         incomeDetailsTotal: 0,
+        detailsCurrentPage: 1,
+        detailsSearchQuery: '',
+        detailsPageSize: 7,
+        detailsMaxVisibleButtons: 3,
+        
+        expenseDetails: [],
+        xInfoTitle: "Month Here",
+        expenseDetailsTotal: 0,
+        xDetailsCurrentPage: 1,
+        xDetailsSearchQuery: '',
+        xDetailsPageSize: 7,
+        xDetailsMaxVisibleButtons: 3,
 
         showDetails(dt) {            
             if(dt.label == "Income") {
@@ -155,6 +167,7 @@ document.addEventListener('alpine:init', () => {
                 for(let i=0; i < len; i++) {
                     if(len > 1) {
                         this.incomeDetails.push({ 
+                            id: i,
                             source: arrSources[i], 
                             date_received: dateFormat(arrDates[i]),
                             amount: arrAmounts[i],
@@ -162,6 +175,7 @@ document.addEventListener('alpine:init', () => {
                         });
                     } else {
                         this.incomeDetails.push({ 
+                            id: 1,
                             source: arrSources, 
                             date_received: dateFormat(arrDates),
                             amount: arrAmounts,
@@ -171,8 +185,60 @@ document.addEventListener('alpine:init', () => {
                 }           
                 this.viewIncomeDetails.classList.remove('hidden');                             
             } else {
-                this.expenseDetails = dt.details;
+                this.xInfoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Expenses Details`;
+                let len = 1;
+                let arrAssets = arrDates = arrAmounts = arrRecipients = [];                
+                if(dt.details.assets.includes(",")) {
+                    arrAssets = dt.details.assets.split(",");       
+                    len = arrAssets.length;             
+                } else {
+                    arrAssets = dt.details.assets;
+                }
+                if(dt.details.dates_expensed.includes(",")) {
+                    arrDates = dt.details.dates_expensed.split(",");                    
+                } else {
+                    arrDates = dt.details.dates_expensed;
+                }
+                if(dt.details.amounts.includes(",")) {
+                    arrAmounts = dt.details.amounts.split(",");
+                    arrAmounts = arrAmounts.map(amt => {
+                        return parseFloat(amt);
+                    });
+                    this.expenseDetailsTotal = currencyFormatter(array_sum(arrAmounts), 'PHP');
+                } else {
+                    arrAmounts = dt.details.amounts;
+                    this.expenseDetailsTotal = currencyFormatter(arrAmounts, 'PHP');
+                }
+                if(dt.details.recipients.includes(",")) {
+                    arrRecipients = dt.details.recipients.split(",");                    
+                } else {
+                    arrRecipients = dt.details.recipients;
+                }
+                for(let i=0; i < len; i++) {
+                    if(len > 1) {
+                        this.expenseDetails.push({ 
+                            id: i,
+                            asset: arrAssets[i], 
+                            date_expensed: dateFormat(arrDates[i]),
+                            amount: arrAmounts[i],
+                            received_by: arrRecipients[i]
+                        });
+                    } else {
+                        this.expenseDetails.push({ 
+                            id: 1,
+                            asset: arrAssets, 
+                            date_expensed: dateFormat(arrDates),
+                            amount: arrAmounts,
+                            received_by: arrRecipients
+                        });
+                    }                    
+                }           
+                this.viewExpenseDetails.classList.remove('hidden');
             }
+        },
+        closeChartExpenseDetails() {
+            this.expenseDetails = [];
+            this.viewExpenseDetails.classList.add('hidden');
         },
         closeChartIncomeDetails() {
             this.incomeDetails = [];
@@ -950,7 +1016,8 @@ document.addEventListener('alpine:init', () => {
             this.viewIncomeModal = document.getElementById('viewIncomeModal');
             this.viewExpenseModal = document.getElementById('viewExpenseModal');    
             this.viewAttendanceModal = document.getElementById('viewAttendanceModal');     
-            this.viewIncomeDetails = document.getElementById('viewIncomeDetails');           
+            this.viewIncomeDetails = document.getElementById('viewIncomeDetails');
+            this.viewExpenseDetails = document.getElementById('viewExpenseDetails');           
         },
         // initChart() {
         //     let grossIncome = this.grossNumber;
@@ -1304,38 +1371,79 @@ document.addEventListener('alpine:init', () => {
             return pages;
         },
 
-        // For Details
+        // For Income Details
 
         get detailsTotalPages() {
-            return Math.ceil(this.detailsFilteredItems.length / this.attPageSize);
+            return Math.ceil(this.detailsFilteredItems.length / this.detailsPageSize);
         },
-        get attPaginatedItems() {
-            const start = (this.attCurrentPage - 1) * this.attPageSize;
-            const end = start + this.attPageSize;
+        get detailsPaginatedItems() {
+            const start = (this.detailsCurrentPage - 1) * this.detailsPageSize;
+            const end = start + this.detailsPageSize;
             return this.detailsFilteredItems.slice(start, end);
         },
         get detailsFilteredItems() {
-            return this.attendances.filter(item => {
-                    let quantity = item.quantity.toString();
-                    return (quantity.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.classification.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.description.toLowerCase().includes(this.attSearchQuery.toLowerCase()) || item.attended_on.toLowerCase().includes(this.attSearchQuery.toLowerCase()))
+            return this.incomeDetails.filter(item => {
+                    let amount = item.amount.toString();
+                    return (amount.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.date_received.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.received_from.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.source.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()))
             });
         },
         nextPage() {
-            if (this.attCurrentPage < this.detailsTotalPages) this.attCurrentPage++;
+            if (this.detailsCurrentPage < this.detailsTotalPages) this.detailsCurrentPage++;
         },
         prevPage() {
-            if (this.attCurrentPage > 1) this.attCurrentPage--;
+            if (this.detailsCurrentPage > 1) this.detailsCurrentPage--;
         },
         goToPage(page) {
-            this.attCurrentPage = page;
+            this.detailsCurrentPage = page;
         },
-        get attVisiblePages() {
-            let start = Math.max(1, this.attCurrentPage - Math.floor(this.attMaxVisibleButtons / 2));
-            let end = start + this.attMaxVisibleButtons - 1;
+        get detailsVisiblePages() {
+            let start = Math.max(1, this.detailsCurrentPage - Math.floor(this.detailsMaxVisibleButtons / 2));
+            let end = start + this.detailsMaxVisibleButtons - 1;
 
             if (end > this.detailsTotalPages) {
                 end = this.detailsTotalPages;
-                start = Math.max(1, end - this.attMaxVisibleButtons + 1);
+                start = Math.max(1, end - this.detailsMaxVisibleButtons + 1);
+            }
+
+            const pages = [];
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            return pages;
+        },
+
+        // For Expense Details
+
+        get xDetailsTotalPages() {
+            return Math.ceil(this.xDetailsFilteredItems.length / this.xDetailsPageSize);
+        },
+        get xDetailsPaginatedItems() {
+            const start = (this.xDetailsCurrentPage - 1) * this.xDetailsPageSize;
+            const end = start + this.xDetailsPageSize;
+            return this.xDetailsFilteredItems.slice(start, end);
+        },
+        get xDetailsFilteredItems() {
+            return this.expenseDetails.filter(item => {
+                    let amount = item.amount.toString();
+                    return (amount.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.date_expensed.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.received_by.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.asset.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()))
+            });
+        },
+        nextPage() {
+            if (this.xDetailsCurrentPage < this.xDetailsTotalPages) this.xDetailsCurrentPage++;
+        },
+        prevPage() {
+            if (this.xDetailsCurrentPage > 1) this.xDetailsCurrentPage--;
+        },
+        goToPage(page) {
+            this.xDetailsCurrentPage = page;
+        },
+        get xDetailsVisiblePages() {
+            let start = Math.max(1, this.xDetailsCurrentPage - Math.floor(this.xDetailsMaxVisibleButtons / 2));
+            let end = start + this.xDetailsMaxVisibleButtons - 1;
+
+            if (end > this.xDetailsTotalPages) {
+                end = this.xDetailsTotalPages;
+                start = Math.max(1, end - this.xDetailsMaxVisibleButtons + 1);
             }
 
             const pages = [];
