@@ -21,31 +21,31 @@
             <!-- table header end -->
 
             <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                <template x-for="(inc, index) in xDetailsPaginatedItems" :key="inc.id">
+                <template x-for="(exp, index) in xDetailsPaginatedItems" :key="exp.id">
                     <tr class="text-sm text-gray-100 text-theme-sm dark:text-white/90">
                         <td class="py-2">
                             <div class="flex items-center gap-3">
-                                <div><p x-text="index+1"></p></div>
+                                <div><p x-text="(xDetailsCurrentPage - 1) * xDetailsPageSize + index + 1"></p></div>
                             </div>
                         </td>
                         <td class="py-2">
                             <div class="flex items-center">
-                                <div><p x-text="inc.asset"></p></div>
+                                <div><p x-text="exp.asset"></p></div>
                             </div>
                         </td>
                         <td class="py-2">
                             <div class="flex items-center">
-                            <p x-text="currencyFormatter(inc.amount, 'PHP')"></p>
+                            <p x-text="currencyFormatter(exp.amount, currency)"></p>
                             </div>
                         </td>
                         <td class="py-2">
                             <div class="flex items-center">
-                            <p x-text="inc.date_expensed"></p>
+                            <p x-text="exp.date_expensed"></p>
                             </div>
                         </td>
                         <td class="py-2">
                             <div class="flex items-center">
-                            <p x-text="inc.received_by"></p>
+                            <p x-text="exp.received_by"></p>
                             </div>
                         </td>                        
                     </tr>

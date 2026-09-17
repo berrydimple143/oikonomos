@@ -26,6 +26,19 @@
 			return User::getAllUserWithSearch($search);				
 		}
 
+		public function changePassword($data) {
+			$id = trim(htmlspecialchars($data['user_id']));
+			$password = trim(htmlspecialchars($data['new_password']));
+			if($password AND $id) {
+				$updated = User::changePassword($password, $id);
+				if($updated) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+
 		public function store($data) {
 			$firstname = trim(htmlspecialchars($data['firstname']));
 			$lastname = trim(htmlspecialchars($data['lastname']));			
@@ -60,6 +73,31 @@
 				return true;
 			} else {
 				return false;
+			}
+		}
+		
+		public function getCurrency($data) {
+			$id = trim(htmlspecialchars($data['user_id']));
+			if($id) {
+				$retrieved = User::getUser($id);
+				if($retrieved) {
+					return $retrieved;
+				} else {
+					return false;
+				}
+			}
+		}
+		
+		public function updateCurrency($data) {
+			$id = trim(htmlspecialchars($data['user_id']));
+			$currency = trim(htmlspecialchars($data['currency']));
+			if($currency AND $id) {
+				$updated = User::updateCurrency($currency, $id);
+				if($updated) {
+					return $updated;
+				} else {
+					return false;
+				}
 			}
 		}
 

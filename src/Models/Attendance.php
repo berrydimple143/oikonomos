@@ -9,8 +9,8 @@
 
 		public static function getAttendanceWithDates($before, $after, $uid) {
 			$pdo = Database::connect();			
-			$attendance = $pdo->query("SELECT SUM(quantity) as total_attendance, GROUP_CONCAT(date_attended SEPARATOR ',') AS dates_attended, GROUP_CONCAT(quantity SEPARATOR ',') AS quantities, GROUP_CONCAT(classification SEPARATOR ',') AS classifications, user_id FROM attendances WHERE date_attended >= '$before' AND date_attended <= '$after' AND user_id = $uid GROUP BY user_id");
-			return $attendance->fetch();
+			$attendance = $pdo->query("SELECT SUM(quantity) as total_attendance, GROUP_CONCAT(date_attended SEPARATOR ',') AS dates_attended, GROUP_CONCAT(quantity SEPARATOR ',') AS quantities, GROUP_CONCAT(classification SEPARATOR ',') AS classifications FROM attendances WHERE date_attended >= '$before' AND date_attended <= '$after' AND user_id = $uid GROUP BY user_id");
+			return $attendance->fetch(PDO::FETCH_OBJ);
 		}
 
 		public static function getAttendances($uid, $year, $month) {			

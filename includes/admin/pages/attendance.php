@@ -95,7 +95,7 @@
                 <tr class="text-sm text-gray-100 text-theme-sm dark:text-white/90">
                     <td class="py-2">
                         <div class="flex items-center gap-3">
-                            <div><p x-text="index+1"></p></div>
+                            <div><p x-text="(attCurrentPage - 1) * attPageSize + index + 1"></p></div>
                         </div>
                     </td>
                     <td class="py-2">
@@ -105,7 +105,7 @@
                     </td>
                     <td class="py-2 text-center">
                         <div class="flex items-center text-center">
-                        <p x-text="att.quantity" class="text-gray-100 text-center text-theme-sm dark:text-gray-400"></p>
+                        <p x-text="att.quantity" class="text-gray-100 text-center text-theme-sm dark:text-gray-400"></p> <span class="ml-2">people</span>
                         </div>
                     </td>
                     <td class="py-2">
@@ -122,8 +122,8 @@
                                     Edit
                                 </button>         
                                 
-                                <button @click.prevent="deleteAttendanceConfirm(att.id)" type="button" class="inline-flex items-center text-[#fe4444] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1  cursor-pointer">                                
-                                <?php includeWithArgs('../images/icons/delete.php', ['color' => '#fe4444', 'class' => 'w-4 h-4 mr-1', 'view' => '0 0 24 24']); ?>
+                                <button @click.prevent="deleteAttendanceConfirm(att.id)" type="button" class="inline-flex items-center text-[#ff8904] border border-gray-200 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-[#fff] dark:focus:ring-[#fff] box-border shadow-xs font-medium leading-5 rounded-base text-sm px-2 py-1  cursor-pointer">                                
+                                <?php includeWithArgs('../images/icons/delete.php', ['color' => '#ff8904', 'class' => 'w-4 h-4 mr-1', 'view' => '0 0 24 24']); ?>
                                     Delete
                                 </button>
 
@@ -149,7 +149,7 @@
                 <td colspan="5">                
                     <div class="flex items-center justify-between">
                         <!-- Pagination Container -->
-                        <div class="flex items-center space-x-1 p-2 bg-gradient-to-t from-[#1E293B] via-[#334155] to-[#0F172A] box-border">                    
+                        <div class="flex items-center space-x-1 p-2 bg-transparent box-border">                    
                                 <!-- Summary Information Indicator -->
                                 <span class="text-lg text-white mr-2">
                                     Page <span class="font-semibold" x-text="attCurrentPage"></span> of <span class="font-semibold" x-text="attTotalPages"></span>

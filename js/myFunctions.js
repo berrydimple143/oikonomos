@@ -143,3 +143,12 @@ window.getFullMonthWord = function(month) {
 window.array_sum = function(numbers) {
     return numbers.reduce((total, num) => total + num, 0);
 };
+// window.getDataByLabel = function(label, arrData) {
+//     if(label == "Income") {
+//         if(arrData.includes(",")) {
+//             return arrData.split(",");        
+//         } else {
+//             return arrData;
+//         }
+//     }
+// };

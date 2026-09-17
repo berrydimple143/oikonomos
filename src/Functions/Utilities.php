@@ -4,6 +4,34 @@
     use DateTime;
 
 	class Utilities {
+
+        public static function getWordMonth(int $m): string {
+            if($m == 1) {
+                return "January";
+            } elseif($m == 2) {
+                return "February";
+            } elseif($m == 3) {
+                return "March";
+            } elseif($m == 4) {
+                return "April";
+            } elseif($m == 5) {
+                return "May";
+            } elseif($m == 6) {
+                return "June";
+            } elseif($m == 7) {
+                return "July";
+            } elseif($m == 8) {
+                return "August";
+            } elseif($m == 9) {
+                return "September";
+            } elseif($m == 10) {
+                return "October";
+            } elseif($m == 11) {
+                return "November";
+            } elseif($m == 12) {
+                return "December";
+            }
+        }
         /**
          * Generates an array of last days for each month in a given year using DateTime.
          *

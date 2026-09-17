@@ -6,6 +6,7 @@
     use App\Controllers\IncomeController;
     use App\Controllers\ExpensesController;
     use App\Controllers\AttendanceController;
+    use App\Functions\Utilities;
 
 	if($_SERVER['REQUEST_METHOD'] === "POST") {
         $income = new IncomeController();
@@ -77,30 +78,30 @@
         $totalExpenses = $janExpense + $febExpense + $marExpense + $aprExpense + $mayExpense + $junExpense + $julExpense + $augExpense + $sepExpense + $octExpense + $novExpense + $decExpense;
 
         // Attendance
-        $janAttendance = $attendance->getAttendancePerMonth($year, '01', $uid);
-        $febAttendance = $attendance->getAttendancePerMonth($year, '02', $uid);
-        $marAttendance = $attendance->getAttendancePerMonth($year, '03', $uid);
-        $aprAttendance = $attendance->getAttendancePerMonth($year, '04', $uid);  
-        $mayAttendance = $attendance->getAttendancePerMonth($year, '05', $uid);
-        $junAttendance = $attendance->getAttendancePerMonth($year, '06', $uid);
-        $julAttendance = $attendance->getAttendancePerMonth($year, '07', $uid);
-        $augAttendance = $attendance->getAttendancePerMonth($year, '08', $uid);
-        $sepAttendance = $attendance->getAttendancePerMonth($year, '09', $uid);
-        $octAttendance = $attendance->getAttendancePerMonth($year, '10', $uid);
-        $novAttendance = $attendance->getAttendancePerMonth($year, '11', $uid);
-        $decAttendance = $attendance->getAttendancePerMonth($year, '12', $uid);
-        $janAttendance = $janAttendance['total_attendance'] ?? 0;
-        $febAttendance = $febAttendance['total_attendance'] ?? 0;
-        $marAttendance = $marAttendance['total_attendance'] ?? 0;
-        $aprAttendance = $aprAttendance['total_attendance'] ?? 0;
-        $mayAttendance = $mayAttendance['total_attendance'] ?? 0;
-        $junAttendance = $junAttendance['total_attendance'] ?? 0;
-        $julAttendance = $julAttendance['total_attendance'] ?? 0;
-        $augAttendance = $augAttendance['total_attendance'] ?? 0;
-        $sepAttendance = $sepAttendance['total_attendance'] ?? 0;
-        $octAttendance = $octAttendance['total_attendance'] ?? 0;
-        $novAttendance = $novAttendance['total_attendance'] ?? 0;
-        $decAttendance = $decAttendance['total_attendance'] ?? 0;
+        $janAttendance = $janAttendance1 = $attendance->getAttendancePerMonth($year, '01', $uid);
+        $febAttendance = $febAttendance1 = $attendance->getAttendancePerMonth($year, '02', $uid);
+        $marAttendance = $marAttendance1 = $attendance->getAttendancePerMonth($year, '03', $uid);
+        $aprAttendance = $aprAttendance1 = $attendance->getAttendancePerMonth($year, '04', $uid);  
+        $mayAttendance = $mayAttendance1 = $attendance->getAttendancePerMonth($year, '05', $uid);
+        $junAttendance = $junAttendance1 = $attendance->getAttendancePerMonth($year, '06', $uid);
+        $julAttendance = $julAttendance1 = $attendance->getAttendancePerMonth($year, '07', $uid);
+        $augAttendance = $augAttendance1 = $attendance->getAttendancePerMonth($year, '08', $uid);
+        $sepAttendance = $sepAttendance1 = $attendance->getAttendancePerMonth($year, '09', $uid);
+        $octAttendance = $octAttendance1 = $attendance->getAttendancePerMonth($year, '10', $uid);
+        $novAttendance = $novAttendance1 = $attendance->getAttendancePerMonth($year, '11', $uid);
+        $decAttendance = $decAttendance1 = $attendance->getAttendancePerMonth($year, '12', $uid);
+        $janAttendance = $janAttendance->total_attendance ?? 0;
+        $febAttendance = $febAttendance->total_attendance ?? 0;
+        $marAttendance = $marAttendance->total_attendance ?? 0;
+        $aprAttendance = $aprAttendance->total_attendance ?? 0;
+        $mayAttendance = $mayAttendance->total_attendance ?? 0;
+        $junAttendance = $junAttendance->total_attendance ?? 0;
+        $julAttendance = $julAttendance->total_attendance ?? 0;
+        $augAttendance = $augAttendance->total_attendance ?? 0;
+        $sepAttendance = $sepAttendance->total_attendance ?? 0;
+        $octAttendance = $octAttendance->total_attendance ?? 0;
+        $novAttendance = $novAttendance->total_attendance ?? 0;
+        $decAttendance = $decAttendance->total_attendance ?? 0;
         $totalAttendance = $janAttendance + $febAttendance + $marAttendance + $aprAttendance + $mayAttendance + $junAttendance + $julAttendance + $augAttendance + $sepAttendance + $octAttendance + $novAttendance + $decAttendance;
 
         $results = [$janIncome, $febIncome, $marIncome, $aprIncome, $mayIncome, $junIncome, $julIncome, $augIncome, $sepIncome, $octIncome, $novIncome, $decIncome, $janExpense, $febExpense, $marExpense, $aprExpense, $mayExpense, $junExpense, $julExpense, $augExpense, $sepExpense, $octExpense, $novExpense, $decExpense, $janAttendance, $febAttendance, $marAttendance, $aprAttendance, $mayAttendance, $junAttendance, $julAttendance, $augAttendance, $sepAttendance, $octAttendance, $novAttendance, $decAttendance];        
@@ -122,24 +123,22 @@
                     $janWeeks = [];
                     $i = 1;
                     $maxValue1 = 0;
-                    $details = [];
+                    //$details = [];
                     $totalJanIncome = $totalJanExpense = $totalAttendance = [];
 
                     foreach($janDataPerWeek["weeks"] as $wk) {
                         $before = (string)$wk['start_date'] . " 00:00:00";
                         $after = (string)$wk['last_day'] . " 23:59:59";
-                        $janIncPW = $income->getIncomePerWeek($before, $after, $uid);   
-                        $details[] = $janIncPW;                         
-
+                        $janIncPW = $incomeDetails = $income->getIncomePerWeek($before, $after, $uid);
                         $janIncPW = $janIncPW->total_amount ?? 0;
                         $totalJanIncome[] = $janIncPW;                        
                         
-                        $janExpPW = $expense->getExpensePerWeek($before, $after, $uid);
+                        $janExpPW = $expenseDetails = $expense->getExpensePerWeek($before, $after, $uid);
                         $janExpPW = $janExpPW->total_amount ?? 0;
                         $totalJanExpense[] = $janExpPW;
 
-                        $attendancePerWeek = $attendance->getAttendancePerWeek($before, $after, $uid);
-                        $attendancePerWeek = $attendancePerWeek['total_attendance'] ?? 0;
+                        $attendancePerWeek = $attendanceDetails = $attendance->getAttendancePerWeek($before, $after, $uid);
+                        $attendancePerWeek = $attendancePerWeek->total_attendance ?? 0;
                         $totalAttendance[] = $attendancePerWeek;                  
 
                         $max = max([$janIncPW, $janExpPW, $attendancePerWeek]);
@@ -151,8 +150,7 @@
                             "maxValue" => $maxValue1, 
                             "maxValueOfIncome" => max($totalJanIncome),
                             "maxValueOfExpense" => max($totalJanExpense),
-                            "maxValueOfAttendance" => max($totalAttendance),
-                            "details" => $details,                            
+                            "maxValueOfAttendance" => max($totalAttendance),                          
                             "month" => "Week " . $i,
                             "total_income" => array_sum($totalJanIncome),
                             "total_expense" => array_sum($totalJanExpense),
@@ -163,6 +161,8 @@
                                     "value" => $janIncPW, 
                                     "start_date" => $before,
                                     "end_date" => $after,
+                                    "details" => $incomeDetails, 
+                                    "month_normal" => Utilities::getWordMonth($k),
                                     "colorStart" => "#10B981", 
                                     "colorEnd" => "#047857"
                                 ],      
@@ -171,6 +171,8 @@
                                     "value" => $janExpPW, 
                                     "start_date" => $before,
                                     "end_date" => $after,
+                                    "details" => $expenseDetails,
+                                    "month_normal" => Utilities::getWordMonth($k),
                                     "colorStart" => "#EF4444", 
                                     "colorEnd" => "#B91C1C" 
                                 ],
@@ -179,6 +181,8 @@
                                     "value" => $attendancePerWeek, 
                                     "start_date" => $before,
                                     "end_date" => $after,
+                                    "details" => $attendanceDetails,
+                                    "month_normal" => Utilities::getWordMonth($k),
                                     "colorStart" => "#3B82F6", 
                                     "colorEnd" => "#1D4ED8" 
                                 ]
@@ -241,6 +245,8 @@
                 }            
             }
 
+        $febday = (string)(Utilities::getLastDaysOfYearMonth($year, 2));        
+        if(strlen($febday) == 1) { $febday = "0".$febday; }
         $defaultData = [
             (object)[
                 "maxValue" => $maxValue,
@@ -248,15 +254,17 @@
                 "maxValueOfExpense" => $maxValueOfExpense,
                 "maxValueOfAttendance" => $maxValueOfAttendance,
                 "total_income" => $totalIncome,
-                "total_expense" => $totalExpenses,     
-                "total_attendance" => $totalAttendance,               
+                "total_expense" => $totalExpenses,
+                "total_attendance" => $totalAttendance,
                 "month" => "Jan",
                 "metrics" => [
                     (object)[
                         "label" => "Income", 
-                        "year" => $year,  
+                        "year" => $year,
                         "value" => $janIncome, 
                         "details" => $janIncome1,
+                        "start_date" => $year . "-01-01 00:00:00",
+                        "end_date" => $year . "-01-31 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857"
                     ],      
@@ -264,6 +272,8 @@
                         "label" => "Expenses", 
                         "value" => $janExpense, 
                         "year" => $year,  
+                        "start_date" => $year . "-01-01 00:00:00",
+                        "end_date" => $year . "-01-31 23:59:59",
                         "details" => $janExpense1,
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
@@ -271,6 +281,10 @@
                     (object)[
                         "label" => "Attendance", 
                         "value" => $janAttendance, 
+                        "details" => $janAttendance1,
+                        "year" => $year,
+                        "start_date" => $year . "-01-01 00:00:00",
+                        "end_date" => $year . "-01-31 23:59:59",
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -291,6 +305,8 @@
                         "year" => $year,  
                         "value" => $febIncome, 
                         "details" => $febIncome1,
+                        "start_date" => $year . "-02-01 00:00:00",
+                        "end_date" => $year . "-02-".$febday." 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -299,12 +315,18 @@
                         "value" => $febExpense, 
                         "year" => $year,  
                         "details" => $febExpense1,
+                        "start_date" => $year . "-02-01 00:00:00",
+                        "end_date" => $year . "-02-".$febday." 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $febAttendance, 
+                        "details" => $febAttendance1,
+                        "start_date" => $year . "-02-01 00:00:00",
+                        "end_date" => $year . "-02-".$febday." 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -322,6 +344,8 @@
                         "value" => $marIncome, 
                         "year" => $year,  
                         "details" => $marIncome1,
+                        "start_date" => $year . "-03-01 00:00:00",
+                        "end_date" => $year . "-03-31 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -330,12 +354,18 @@
                         "value" => $marExpense, 
                         "year" => $year,  
                         "details" => $marExpense1,
+                        "start_date" => $year . "-03-01 00:00:00",
+                        "end_date" => $year . "-03-31 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $marAttendance, 
+                        "details" => $marAttendance1,
+                        "year" => $year,
+                        "start_date" => $year . "-03-01 00:00:00",
+                        "end_date" => $year . "-03-31 23:59:59",
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -352,6 +382,8 @@
                         "label" => "Income", 
                         "value" => $aprIncome, 
                         "year" => $year,  
+                        "start_date" => $year . "-04-01 00:00:00",
+                        "end_date" => $year . "-04-30 23:59:59",
                         "details" => $aprIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
@@ -361,12 +393,18 @@
                         "value" => $aprExpense, 
                         "year" => $year,  
                         "details" => $aprExpense1,
+                        "start_date" => $year . "-04-01 00:00:00",
+                        "end_date" => $year . "-04-30 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $aprAttendance, 
+                        "details" => $aprAttendance1,
+                        "year" => $year,
+                        "start_date" => $year . "-04-01 00:00:00",
+                        "end_date" => $year . "-04-30 23:59:59",
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -382,6 +420,8 @@
                         "label" => "Income", 
                         "value" => $mayIncome, 
                         "year" => $year,           
+                        "start_date" => $year . "-05-01 00:00:00",
+                        "end_date" => $year . "-05-31 23:59:59",
                         "details" => $mayIncome1,
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
@@ -391,12 +431,18 @@
                         "value" => $mayExpense, 
                         "year" => $year,  
                         "details" => $mayExpense1,
+                        "start_date" => $year . "-05-01 00:00:00",
+                        "end_date" => $year . "-05-31 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $mayAttendance, 
+                        "details" => $mayAttendance1,
+                        "start_date" => $year . "-05-01 00:00:00",
+                        "end_date" => $year . "-05-31 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -413,6 +459,8 @@
                         "value" => $junIncome, 
                         "year" => $year,  
                         "details" => $junIncome1,
+                        "start_date" => $year . "-06-01 00:00:00",
+                        "end_date" => $year . "-06-30 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -421,12 +469,18 @@
                         "value" => $junExpense, 
                         "year" => $year,  
                         "details" => $junExpense1,
+                        "start_date" => $year . "-06-01 00:00:00",
+                        "end_date" => $year . "-06-30 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $junAttendance, 
+                        "details" => $junAttendance1,
+                        "start_date" => $year . "-06-01 00:00:00",
+                        "end_date" => $year . "-06-30 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -443,6 +497,8 @@
                         "value" => $julIncome, 
                         "year" => $year,  
                         "details" => $julIncome1,
+                        "start_date" => $year . "-07-01 00:00:00",
+                        "end_date" => $year . "-07-31 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -451,12 +507,18 @@
                         "value" => $julExpense, 
                         "year" => $year,  
                         "details" => $julExpense1,
+                        "start_date" => $year . "-07-01 00:00:00",
+                        "end_date" => $year . "-07-31 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $julAttendance, 
+                        "details" => $julAttendance1,
+                        "start_date" => $year . "-07-01 00:00:00",
+                        "end_date" => $year . "-07-31 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -473,6 +535,8 @@
                         "value" => $augIncome, 
                         "year" => $year, 
                         "details" => $augIncome1,
+                        "start_date" => $year . "-08-01 00:00:00",
+                        "end_date" => $year . "-08-31 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -481,12 +545,18 @@
                         "value" => $augExpense, 
                         "year" => $year,  
                         "details" => $augExpense1,
+                        "start_date" => $year . "-08-01 00:00:00",
+                        "end_date" => $year . "-08-31 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $augAttendance, 
+                        "details" => $augAttendance1,
+                        "year" => $year,
+                        "start_date" => $year . "-08-01 00:00:00",
+                        "end_date" => $year . "-08-31 23:59:59",
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -503,6 +573,8 @@
                         "value" => $sepIncome, 
                         "year" => $year,  
                         "details" => $sepIncome1,
+                        "start_date" => $year . "-09-01 00:00:00",
+                        "end_date" => $year . "-09-30 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -511,12 +583,18 @@
                         "value" => $sepExpense, 
                         "year" => $year,  
                         "details" => $sepExpense1,
+                        "start_date" => $year . "-09-01 00:00:00",
+                        "end_date" => $year . "-09-30 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $sepAttendance, 
+                        "details" => $sepAttendance1,
+                        "year" => $year,
+                        "start_date" => $year . "-09-01 00:00:00",
+                        "end_date" => $year . "-09-30 23:59:59",
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -533,6 +611,8 @@
                         "value" => $octIncome, 
                         "year" => $year,  
                         "details" => $octIncome1,
+                        "start_date" => $year . "-10-01 00:00:00",
+                        "end_date" => $year . "-10-31 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -541,12 +621,18 @@
                         "value" => $octExpense, 
                         "year" => $year,  
                         "details" => $octExpense1,
+                        "start_date" => $year . "-10-01 00:00:00",
+                        "end_date" => $year . "-10-31 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $octAttendance, 
+                        "details" => $octAttendance1,
+                        "start_date" => $year . "-10-01 00:00:00",
+                        "end_date" => $year . "-10-31 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -563,6 +649,8 @@
                         "value" => $novIncome, 
                         "year" => $year,  
                         "details" => $novIncome1,
+                        "start_date" => $year . "-11-01 00:00:00",
+                        "end_date" => $year . "-11-30 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -571,12 +659,18 @@
                         "value" => $novExpense, 
                         "year" => $year,  
                         "details" => $novExpense1,
+                        "start_date" => $year . "-11-01 00:00:00",
+                        "end_date" => $year . "-11-30 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $novAttendance, 
+                        "details" => $novAttendance1,
+                        "start_date" => $year . "-11-01 00:00:00",
+                        "end_date" => $year . "-11-30 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]
@@ -593,6 +687,8 @@
                         "value" => $decIncome, 
                         "year" => $year,    
                         "details" => $decIncome1,
+                        "start_date" => $year . "-12-01 00:00:00",
+                        "end_date" => $year . "-12-31 23:59:59",
                         "colorStart" => "#10B981", 
                         "colorEnd" => "#047857" 
                     ],      
@@ -601,12 +697,18 @@
                         "value" => $decExpense, 
                         "year" => $year,  
                         "details" => $decExpense1,
+                        "start_date" => $year . "-12-01 00:00:00",
+                        "end_date" => $year . "-12-31 23:59:59",
                         "colorStart" => "#EF4444", 
                         "colorEnd" => "#B91C1C" 
                     ],
                     (object)[
                         "label" => "Attendance", 
                         "value" => $decAttendance, 
+                        "details" => $decAttendance1,
+                        "start_date" => $year . "-12-01 00:00:00",
+                        "end_date" => $year . "-12-31 23:59:59",
+                        "year" => $year,
                         "colorStart" => "#3B82F6", 
                         "colorEnd" => "#1D4ED8" 
                     ]

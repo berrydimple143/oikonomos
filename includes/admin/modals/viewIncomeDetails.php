@@ -25,7 +25,7 @@
                     <tr class="text-sm text-gray-100 text-theme-sm dark:text-white/90">
                         <td class="py-2">
                             <div class="flex items-center gap-3">
-                                <div><p x-text="index+1"></p></div>
+                                <div><p x-text="(detailsCurrentPage - 1) * detailsPageSize + index + 1"></p></div>
                             </div>
                         </td>
                         <td class="py-2">
@@ -35,7 +35,7 @@
                         </td>
                         <td class="py-2">
                             <div class="flex items-center">
-                            <p x-text="currencyFormatter(inc.amount, 'PHP')"></p>
+                            <p x-text="currencyFormatter(inc.amount, currency)"></p>
                             </div>
                         </td>
                         <td class="py-2">

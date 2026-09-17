@@ -1,6 +1,6 @@
 <?php 
     require_once '../src/Functions/helpers.php'; 
-    $url = getFullUrl(); 
+    $url = getFullUrl(''); 
 ?>
 <!doctype html>
 <html lang="en">
@@ -26,8 +26,11 @@
         </style>
   </head>
   <body x-data="dashboardLoad">
+    <?php include('../includes/admin/modals/changePassword.php'); ?>
+    <?php include('../includes/admin/modals/loadingModal.php'); ?>
     <?php include('../includes/admin/modals/viewIncomeDetails.php'); ?>
     <?php include('../includes/admin/modals/viewExpenseDetails.php'); ?>
+    <?php include('../includes/admin/modals/viewAttendanceDetails.php'); ?>
     <?php include('../includes/admin/modals/incomeModal.php'); ?>
     <?php include('../includes/admin/modals/viewIncomeModal.php'); ?>
     <?php include('../includes/admin/modals/expenseModal.php'); ?>    

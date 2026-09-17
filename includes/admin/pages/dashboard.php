@@ -18,11 +18,11 @@
                     </button>
                 </template>
             </div>
-            <div class="flex items-center space-x-4">
-                <!-- Month Selector -->
+            <div class="flex items-center space-x-4">                    
+                <!-- Year Selector -->
                 <div class="flex items-center gap-2">
                     <label for="selectedYear" class="text-xs font-semibold text-white">Year:</label>
-                    <select @change.prevent="getRawData" id="selectedYear" x-model="selectedYear" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select @change.prevent="selectYearMonth" id="selectedYear" x-model="selectedYear" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <template x-for="yr in yearSelection" :key="yr">
                             <option :value="yr" x-text="yr"></option>
                         </template>
@@ -31,13 +31,22 @@
                 <!-- Month Selector -->
                 <div class="flex items-center gap-2">
                     <label for="selectedMonth" class="text-xs font-semibold text-white">Month:</label>
-                    <select @change.prevent="getRawData" id="selectedMonth" x-model="selectedMonth" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select @change.prevent="selectYearMonth" id="selectedMonth" x-model="selectedMonth" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="all">All Months</option>
                         <template x-for="item in graphSelection" :key="item.abbr">
                             <option :value="item.abbr" x-text="item.month"></option>
                         </template>
                     </select>
                 </div>       
+                <!-- Currency Selector -->
+                <div class="flex items-center gap-2">
+                    <label for="currency" class="text-xs font-semibold text-white">Currency:</label>
+                    <select @change.prevent="selectCurrency" id="currency" x-model="currency" class="bg-slate-900 border border-slate-700 text-sm text-white rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <template x-for="curr in currencyList" :key="curr.id">
+                            <option class="text-lg" :value="curr.id" x-text="curr.symbol"></option>
+                        </template>
+                    </select>                    
+                </div>   
             </div>
     </div>    
 

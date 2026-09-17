@@ -64,6 +64,7 @@
                                     modal.classList.add('hidden');
                                     sessionStorage.setItem("user_id", res.user.id);
                                     sessionStorage.setItem("email", res.user.email);
+                                    sessionStorage.setItem("password", res.user.password);
                                     sessionStorage.setItem("firstname", res.user.firstname);
                                     sessionStorage.setItem("lastname", res.user.lastname);
                                     sessionStorage.setItem("organization", res.user.organization);                                    

@@ -16,6 +16,7 @@ document.addEventListener('alpine:init', () => {
         currentYear: null,
         user_id: null,
         user_email: null,
+        user_password: null,
         user_firstname: null,
         user_lastname: null,
         user_organization: null,        
@@ -30,10 +31,8 @@ document.addEventListener('alpine:init', () => {
         description: '',
         inmode: 'add',
         incomeModal: null,
-        viewIncomeModal: null,
-        viewIncomeDetails: null,
+        viewIncomeModal: null,        
         incomeAPI: '../api/admin/income.php',
-        //incomeCounterAPI: '../api/admin/countIncome.php',
         incomeTotal: 0,
         currentPage: 1,
         searchQuery: '',
@@ -54,8 +53,7 @@ document.addEventListener('alpine:init', () => {
         viewExpenseModal: null,
         expensed_on: dateTimeNowFormatter('datetime'),
         date_expensed: dateTimeNowFormatter('datetime'),
-        expenseAPI: '../api/admin/expense.php',
-        //expenseCounterAPI: '../api/admin/countExpense.php',      
+        expenseAPI: '../api/admin/expense.php', 
         expenseTotal: 0,          
         expenses: [],
         expenseId: null,
@@ -115,35 +113,183 @@ document.addEventListener('alpine:init', () => {
             { abbr: 'Nov', month: 'November' },
             { abbr: 'Dec', month: 'December' }
         ],
-        yearSelection: [],        
-        viewExpenseDetails: null,
+        yearSelection: [],
+        viewIncomeDetails: null,
         incomeDetails: [],
         infoTitle: "Month Here",
         incomeDetailsTotal: 0,
         detailsCurrentPage: 1,
         detailsSearchQuery: '',
-        detailsPageSize: 7,
+        detailsPageSize: 6,
         detailsMaxVisibleButtons: 3,
-        
+        viewExpenseDetails: null,
         expenseDetails: [],
         xInfoTitle: "Month Here",
         expenseDetailsTotal: 0,
         xDetailsCurrentPage: 1,
         xDetailsSearchQuery: '',
-        xDetailsPageSize: 7,
+        xDetailsPageSize: 6,
         xDetailsMaxVisibleButtons: 3,
+        viewAttendanceDetails: null,
+        attendanceDetails: [],
+        attInfoTitle: "Month Here",
+        attendanceDetailsTotal: 0,
+        attDetailsCurrentPage: 1,
+        attDetailsSearchQuery: '',
+        attDetailsPageSize: 6,
+        attDetailsMaxVisibleButtons: 3,
+        isLoading: false,
+        loadingModal: null,
+        userAPI: '../api/admin/user.php', 
+        currency: null,
+        currencyList: [
+            { id: 'PHP', symbol: '\u20B1' },
+            { id: 'USD', symbol: '\u0024' },
+            { id: 'EUR', symbol: '\u20AC' },
+            { id: 'JPY', symbol: '\u00A5' },
+            { id: 'GBP', symbol: '\u00A3' },
+            { id: 'INR', symbol: '\u20B9' },
+            { id: 'KRW', symbol: '\u20A9' },
+            { id: 'CHF', symbol: '\u20A3' },
+            { id: 'ILS', symbol: '\u20AA' },
+            { id: 'THB', symbol: '\u0E3F' },
+            { id: 'KHR', symbol: '\u17DB' },
+            { id: 'NGN', symbol: '\u20A6' },
+            { id: 'UAH', symbol: '\u20B4' },
+            { id: 'PYG', symbol: '\u20B2' },
+            { id: 'CRC', symbol: '\u20A1' },
+            { id: 'BRZ', symbol: '\u20A2' },
+            { id: 'GRD', symbol: '\u20AF' },
+            { id: 'GHS', symbol: '\u20B5' },
+            { id: 'KZT', symbol: '\u20B8' },
+            { id: 'AZN', symbol: '\u20BC' },
+            { id: 'TWD', symbol: '\u5143' },
+            { id: 'IDR', symbol: '\u0052\u0070' }
+        ],
+        changePasswordModal: null,
+        old_password: null,
+        new_password: null,
+        retype_password: null,
+        pageName: '',
+        passwordError: '',
+        hasPasswordError: false,
 
-        showDetails(dt) {            
-            if(dt.label == "Income") {
-                this.infoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Income Details`;
+        changePassword() {
+            this.changePasswordModal.classList.remove('hidden');
+        },
+
+        isPasswordsEqual(np, rp) {
+            if(np != rp) {
+                return false;
+            }
+            return true;
+        },
+
+        async submitPasswordChange() {
+            if(this.isPasswordsEqual(this.new_password, this.retype_password)) {
+                try {                               
+                    let response = await fetch(this.userAPI, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ 
+                            user_id: this.user_id,
+                            currency: "sample",
+                            old_password: this.old_password,
+                            new_password: this.new_password,
+                            user_password: this.user_password,
+                            mode: "changePassword"
+                        })
+                    });
+                    const res = await response.json();     
+                    
+                    if(!res.status && res.message == "Current password is incorrect!") {
+                        this.showPasswordError(res.message, 1500);
+                        return;
+                    } else {
+                        this.changePasswordModal.classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error("Error loading JSON data:", error);
+                    return; 
+                }
+            } else {                
+                this.showPasswordError("Password mismatch!", 1500);
+            }            
+        },
+
+        showPasswordError(msg, sec) {
+            this.passwordError = msg;
+            this.hasPasswordError = true;
+            setTimeout(() => {
+                this.hasPasswordError = false;
+            }, sec);
+        },
+
+        async initCurrency() {
+            try {                               
+                let response = await fetch(this.userAPI, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        user_id: this.user_id,
+                        currency: "sample",
+                        old_password: "sample",
+                        new_password: "sample",
+                        user_password: "sample",
+                        mode: "getCurrency"
+                    })
+                });
+                const res = await response.json();        
+                if(res.status) {
+                    this.currency = res.data.currency;
+                }
+            } catch (error) {
+                console.error("Error loading JSON data:", error);
+                return;
+            }
+        },
+
+        async selectCurrency() {
+            try {                               
+                let response = await fetch(this.userAPI, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        user_id: this.user_id,
+                        currency: this.currency,
+                        old_password: "sample",
+                        new_password: "sample",
+                        user_password: "sample",
+                        mode: "editCurrency"
+                    })
+                });
+                const res = await response.json();        
+                if(res.status) {
+                    this.currency = res.data.currency;
+                    window.location.href = './';
+                }
+            } catch (error) {
+                console.error("Error loading JSON data:", error);
+                return;
+            }
+        },
+
+        showDetails(dt) {
+            if(dt.label == "Income") {           
+                if(this.selectedMonth === "all") {
+                    this.infoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Income Details`;
+                } else {
+                    this.infoTitle = `${dateFormat(dt.start_date)} to ${dateFormat(dt.end_date)} Income Details`;
+                }
                 let len = 1;
-                let arrSources = arrDates = arrAmounts = arrRecipients = [];                
+                let arrSources = arrDates = arrAmounts = arrRecipients = [];  
                 if(dt.details.sources.includes(",")) {
                     arrSources = dt.details.sources.split(",");       
                     len = arrSources.length;             
                 } else {
                     arrSources = dt.details.sources;
                 }
+
                 if(dt.details.dates_received.includes(",")) {
                     arrDates = dt.details.dates_received.split(",");                    
                 } else {
@@ -154,10 +300,10 @@ document.addEventListener('alpine:init', () => {
                     arrAmounts = arrAmounts.map(amt => {
                         return parseFloat(amt);
                     });
-                    this.incomeDetailsTotal = currencyFormatter(array_sum(arrAmounts), 'PHP');
+                    this.incomeDetailsTotal = currencyFormatter(array_sum(arrAmounts), this.currency);
                 } else {
                     arrAmounts = dt.details.amounts;
-                    this.incomeDetailsTotal = currencyFormatter(arrAmounts, 'PHP');
+                    this.incomeDetailsTotal = currencyFormatter(arrAmounts, this.currency);
                 }
                 if(dt.details.recipients.includes(",")) {
                     arrRecipients = dt.details.recipients.split(",");                    
@@ -184,8 +330,12 @@ document.addEventListener('alpine:init', () => {
                     }                    
                 }           
                 this.viewIncomeDetails.classList.remove('hidden');                             
-            } else {
-                this.xInfoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Expenses Details`;
+            } else if(dt.label == "Expenses") {
+                if(this.selectedMonth === "all") {
+                    this.xInfoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Expenses Details`;
+                } else {
+                    this.xInfoTitle = `${dateFormat(dt.start_date)} to ${dateFormat(dt.end_date)} Expenses Details`;
+                }
                 let len = 1;
                 let arrAssets = arrDates = arrAmounts = arrRecipients = [];                
                 if(dt.details.assets.includes(",")) {
@@ -204,10 +354,10 @@ document.addEventListener('alpine:init', () => {
                     arrAmounts = arrAmounts.map(amt => {
                         return parseFloat(amt);
                     });
-                    this.expenseDetailsTotal = currencyFormatter(array_sum(arrAmounts), 'PHP');
+                    this.expenseDetailsTotal = currencyFormatter(array_sum(arrAmounts), this.currency);
                 } else {
                     arrAmounts = dt.details.amounts;
-                    this.expenseDetailsTotal = currencyFormatter(arrAmounts, 'PHP');
+                    this.expenseDetailsTotal = currencyFormatter(arrAmounts, this.currency);
                 }
                 if(dt.details.recipients.includes(",")) {
                     arrRecipients = dt.details.recipients.split(",");                    
@@ -234,7 +384,58 @@ document.addEventListener('alpine:init', () => {
                     }                    
                 }           
                 this.viewExpenseDetails.classList.remove('hidden');
+            } else if(dt.label == "Attendance") {                
+                if(this.selectedMonth === "all") {
+                    this.attInfoTitle = `${getFullMonthWord(dt.month)} ${dt.year} Attendance Details`;
+                } else {
+                    this.attInfoTitle = `${dateFormat(dt.start_date)} to ${dateFormat(dt.end_date)} Attendance Details`;
+                }
+                let len = 1;
+                let arrDates = arrQuantities = arrClassifications = [];               
+                if(dt.details.dates_attended.includes(",")) {
+                    arrDates = dt.details.dates_attended.split(",");                    
+                } else {
+                    arrDates = dt.details.dates_attended;
+                }
+                if(dt.details.quantities.includes(",")) {
+                    arrQuantities = dt.details.quantities.split(",");
+                    arrQuantities = arrQuantities.map(qty => {
+                        return parseInt(qty);
+                    });
+                    this.attendanceDetailsTotal = array_sum(arrQuantities);
+                } else {
+                    arrQuantities = dt.details.quantities;
+                    this.attendanceDetailsTotal = arrQuantities;
+                }
+                if(dt.details.classifications.includes(",")) {
+                    arrClassifications = dt.details.classifications.split(",");       
+                    len = arrClassifications.length;              
+                } else {
+                    arrClassifications = dt.details.classifications;
+                }
+                for(let i=0; i < len; i++) {
+                    if(len > 1) {
+                        this.attendanceDetails.push({ 
+                            id: i,
+                            classification: arrClassifications[i], 
+                            date_attended: dateFormat(arrDates[i]),
+                            quantity: arrQuantities[i]
+                        });
+                    } else {
+                        this.attendanceDetails.push({ 
+                            id: 1,
+                            classification: arrClassifications, 
+                            date_attended: dateFormat(arrDates),
+                            quantity: arrQuantities
+                        });
+                    }                    
+                }           
+                this.viewAttendanceDetails.classList.remove('hidden');
             }
+        },
+        closeChartAttendanceDetails() {
+            this.attendanceDetails = [];
+            this.viewAttendanceDetails.classList.add('hidden');
         },
         closeChartExpenseDetails() {
             this.expenseDetails = [];
@@ -244,8 +445,16 @@ document.addEventListener('alpine:init', () => {
             this.incomeDetails = [];
             this.viewIncomeDetails.classList.add('hidden');
         },
-        async getRawData() {
-            try {
+        loadModal(tm) {
+            this.isLoading = true;
+            this.loadingModal.classList.remove('hidden'); 
+            setTimeout(() => {
+                this.isLoading = false;
+                this.loadingModal.classList.add('hidden');
+            }, tm);
+        },
+        async getRawData() {                     
+            try {                               
                 let response = await fetch(this.chartDataAPI, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -258,7 +467,7 @@ document.addEventListener('alpine:init', () => {
                 this.rawData = await response.json();
                 if (this.rawData.length > 0) {
                     let maxV = this.rawData[0].maxValue;
-                    if(this.selectedMonth !== "all") {
+                    if(this.selectedMonth !== "all") {                        
                         const dlen = this.rawData.length - 1;
                         this.maxValue = this.rawData[dlen].maxValue;
                         this.maxValueOfIncome = this.rawData[dlen].maxValueOfIncome;
@@ -382,22 +591,25 @@ document.addEventListener('alpine:init', () => {
             const y = d3.scaleLinear()
                 //.domain([0, d3.max(d.metrics, d => d.value)])
                 .domain([0, this.maxValue * 1.15])
-                .range([height, 0]);
-
+                .range([height, 0]);            
+            let headerText = "Income, Expenses & Attendance as of " + this.currentYear;
+            if(this.selectedMonth != "all") {
+                headerText = "Income, Expenses & Attendance as of " + getFullMonthWord(this.selectedMonth) + " " + this.currentYear;
+            }
             // Header Text
             svg.append('text')                
                 .attr('y', 12)
-                .attr('x', 10)
+                .attr('x', 5)
                 .attr('text-anchor', 'start')
-                .attr('class', 'fill-gray-100 text-[12px] font-semibold tracking-tighter')
-                .text("Income & Expenses with Attendance as of " + this.currentYear);
+                .attr('class', 'fill-gray-100 text-[10px] font-semibold tracking-tighter')
+                .text(headerText);
             
             // Gross, Expense and Net Text
-            const computations = "Gross Income: " + currencyFormatter(this.grossNumber, 'PHP') + " | " + "Expenses: " + currencyFormatter(this.expenseNumber, 'PHP') + " | Net Income: " + currencyFormatter((this.grossNumber - this.expenseNumber), 'PHP');
+            const computations = "Gross Income: " + currencyFormatter(this.grossNumber, this.currency) + " | " + "Expenses: " + currencyFormatter(this.expenseNumber, this.currency) + " | Net Income: " + currencyFormatter((this.grossNumber - this.expenseNumber), this.currency);
             
             svg.append('text')
                 .attr('y', 12)
-                .attr('x', width / 2)
+                .attr('x', (width / 2) - 90)
                 .attr('text-anchor', 'start')
                 .attr('class', 'fill-gray-100 text-[11px] font-semibold tracking-normal')
                 .text(computations);                        
@@ -474,20 +686,31 @@ document.addEventListener('alpine:init', () => {
                     tooltip
                     .style('opacity', '1')
                     .html(`
-                        <div class="font-bold text-slate-100 mb-1 border-b border-slate-100 pb-0.5">${d.month}</div>
-                        <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full" style="background-color: ${d.colorStart}"></span>
-                        <span class="text-slate-100">${d.label}:</span>
-                        <span class="font-mono font-semibold text-white">${currencyFormatterWithChecking(d.value, 'PHP', d.label)}</span>
+                        <div class="mb-1 border-b border-slate-100 pb-0.5">
+                            <span class="text-slate-100 text-[12px]">${dateFormat(d.start_date)} - ${dateFormat(d.end_date)}</span> 
+                        </div>
+                        <div class="flex items-center gap-2 pb-2">
+                            <span class="w-2 h-2 rounded-full" style="background-color: ${d.colorStart}"></span>
+                            <span class="text-slate-100">${d.label}:</span>
+                            <span class="font-mono font-semibold text-white">${currencyFormatterWithChecking(d.value, this.currency, d.label)}</span>
+                        </div>                 
+                        <div>
+                            <span class="font-mono font-semibold text-white">Click for more details</span>
                         </div>
                     `)
                     .style('left', `${event.offsetX + 12}px`)
-                    .style('top', `${event.offsetY - 35}px`);
+                    .style('top', `${event.offsetY - 85}px`);
                 })
-                .on('mousemove', (event) => {
+                .on('mousemove', (event, d) => {
+                    let mml = 100;
+                    if(d.month == "Jan") {
+                        mml = 20;
+                    } else if(d.month == "Dec") {
+                        mml = 180;
+                    }
                     tooltip
-                    .style('left', `${event.offsetX - 100}px`)
-                    .style('top', `${event.offsetY - 65}px`);
+                    .style('left', `${event.offsetX - mml}px`)
+                    .style('top', `${event.offsetY - 85}px`);
                 })
                 .on('mouseout', () => tooltip.style('opacity', '0'))
                 .transition()
@@ -506,7 +729,7 @@ document.addEventListener('alpine:init', () => {
                 .attr('y', height)
                 .attr('text-anchor', 'middle')
                 .text(d => d3.format('~s')(d.value))
-                //.text(d => currencyFormatter(d.value, 'PHP'))
+                //.text(d => currencyFormatter(d.value, this.currency))
                 .transition()
                 .duration(600)
                 .ease(d3.easeCubicOut)
@@ -800,7 +1023,7 @@ document.addEventListener('alpine:init', () => {
 
         viewIncome(info) {
             this.source = info.source;
-            this.amount = currencyFormatter(info.amount, 'PHP');
+            this.amount = currencyFormatter(info.amount, this.currency);
             this.user_id = info.user_id;
             this.received_from = info.received_from;
             this.date_received = info.date_received;
@@ -817,7 +1040,7 @@ document.addEventListener('alpine:init', () => {
 
         viewExpense(info) {
             this.asset = info.asset;
-            this.amount = currencyFormatter(info.amount, 'PHP');
+            this.amount = currencyFormatter(info.amount, this.currency);
             this.user_id = info.user_id;
             this.received_by = info.received_by;
             this.date_expensed = info.date_expensed;
@@ -959,18 +1182,26 @@ document.addEventListener('alpine:init', () => {
             let sumOfNumber = 0;
             if(tp == 'income') {
                 const arrayOfAmount = this.incomes.map(inc => (sumOfNumber += parseFloat(inc.amount)));  
-                this.incomeTotal = currencyFormatter(sumOfNumber, 'PHP');
+                this.incomeTotal = currencyFormatter(sumOfNumber, this.currency);
             } else if(tp == 'expense') {
                 const arrayOfAmount = this.expenses.map(exp => (sumOfNumber += parseFloat(exp.amount)));  
-                this.expenseTotal = currencyFormatter(sumOfNumber, 'PHP');
+                this.expenseTotal = currencyFormatter(sumOfNumber, this.currency);
             } else if(tp == 'attendance') {
                 const arrayOfAmount = this.attendances.map(att => (sumOfNumber += att.quantity));
                 this.attendanceTotal = sumOfNumber;
             }
         },
+        selectYearMonth() {
+            this.loadModal(1000);    
+            this.getRawData();      
+        },
         navigate(pg) {
-            this.getRawData();
-            if(pg === "income") {
+            this.pageName = pg;
+            this.changePasswordModal.classList.add('hidden');
+            this.getRawData();            
+            if(pg === "") {                
+                this.loadModal(1000);
+            } else if(pg === "income") {
                 this.updateTotal('income');
             } else if(pg === "income_form") {
                 if(this.inmode == "add") {
@@ -1001,6 +1232,7 @@ document.addEventListener('alpine:init', () => {
             this.user_email = sessionStorage.getItem("email");
             this.user_firstname = sessionStorage.getItem("firstname");
             this.user_lastname = sessionStorage.getItem("lastname");
+            this.user_password = sessionStorage.getItem("password");
             this.user_organization = sessionStorage.getItem("organization");
             
             setTimeout(() => {
@@ -1008,8 +1240,9 @@ document.addEventListener('alpine:init', () => {
                     window.location = this.redirectUrl;
                 } 
             }, 50);
-        },
+        },        
         initModals() {
+            this.loadingModal = document.getElementById('loadingModal');
             this.incomeModal = document.getElementById('incomeModal');
             this.expenseModal = document.getElementById('expenseModal');
             this.attendanceModal = document.getElementById('attendanceModal');
@@ -1017,7 +1250,9 @@ document.addEventListener('alpine:init', () => {
             this.viewExpenseModal = document.getElementById('viewExpenseModal');    
             this.viewAttendanceModal = document.getElementById('viewAttendanceModal');     
             this.viewIncomeDetails = document.getElementById('viewIncomeDetails');
-            this.viewExpenseDetails = document.getElementById('viewExpenseDetails');           
+            this.viewExpenseDetails = document.getElementById('viewExpenseDetails'); 
+            this.viewAttendanceDetails = document.getElementById('viewAttendanceDetails');
+            this.changePasswordModal = document.getElementById('changePasswordModal');            
         },
         // initChart() {
         //     let grossIncome = this.grossNumber;
@@ -1042,12 +1277,12 @@ document.addEventListener('alpine:init', () => {
         //             const labelX = x - 20;
                     
         //             ctx.fillText('Gross Income : ', labelX, y);
-        //             ctx.fillText(currencyFormatter(grossIncome, 'PHP'), totalX, y);
+        //             ctx.fillText(currencyFormatter(grossIncome, this.currency), totalX, y);
         //             ctx.fillText('Expenses        : ', labelX, y + 15);   
-        //             ctx.fillText("- " + currencyFormatter(expenses, 'PHP'), totalX - 4, y + 15);    
+        //             ctx.fillText("- " + currencyFormatter(expenses, this.currency), totalX - 4, y + 15);    
         //             ctx.fillText("_________________________________", lineX, y + 19);
         //             ctx.fillText('Net Income      : ', labelX, y + 35);
-        //             ctx.fillText(currencyFormatter(netIncome, 'PHP'), totalX, y + 35);
+        //             ctx.fillText(currencyFormatter(netIncome, this.currency), totalX, y + 35);
 
         //             ctx.strokeStyle = "#fff";
         //             ctx.lineWidth = 1;
@@ -1174,7 +1409,7 @@ document.addEventListener('alpine:init', () => {
         //                     },
         //                     formatter: function(value, context) {
         //                         if(context.dataset.label != "Attendance") {
-        //                             return currencyFormatter(value, 'PHP');
+        //                             return currencyFormatter(value, this.currency);
         //                         } else {
         //                             return value;
         //                         }                                            
@@ -1228,12 +1463,13 @@ document.addEventListener('alpine:init', () => {
         //     }
         // },
         init() {
-            this.checkAuth();
+            this.checkAuth();            
             this.currentYear = getCurrentDate('y');
             this.yearSelection = initYearSelection([], 1950, this.currentYear);           
             this.incomeYear = this.currentYear;
             this.expenseYear = this.currentYear;
             this.attendanceYear = this.currentYear;
+            this.initCurrency();
             this.initIncomes();
             this.initExpenses();
             this.initAttendances();
@@ -1444,6 +1680,47 @@ document.addEventListener('alpine:init', () => {
             if (end > this.xDetailsTotalPages) {
                 end = this.xDetailsTotalPages;
                 start = Math.max(1, end - this.xDetailsMaxVisibleButtons + 1);
+            }
+
+            const pages = [];
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            return pages;
+        },
+
+        // For Attendance Details
+
+        get attDetailsTotalPages() {
+            return Math.ceil(this.attDetailsFilteredItems.length / this.attDetailsPageSize);
+        },
+        get attDetailsPaginatedItems() {
+            const start = (this.attDetailsCurrentPage - 1) * this.attDetailsPageSize;
+            const end = start + this.attDetailsPageSize;
+            return this.attDetailsFilteredItems.slice(start, end);
+        },
+        get attDetailsFilteredItems() {
+            return this.attendanceDetails.filter(item => {
+                    let quantity = item.quantity.toString();
+                    return (quantity.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.classification.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()) || item.date_attended.toLowerCase().includes(this.detailsSearchQuery.toLowerCase()))
+            });
+        },
+        nextPage() {
+            if (this.attDetailsCurrentPage < this.attDetailsTotalPages) this.attDetailsCurrentPage++;
+        },
+        prevPage() {
+            if (this.attDetailsCurrentPage > 1) this.attDetailsCurrentPage--;
+        },
+        goToPage(page) {
+            this.attDetailsCurrentPage = page;
+        },
+        get attDetailsVisiblePages() {
+            let start = Math.max(1, this.attDetailsCurrentPage - Math.floor(this.attDetailsMaxVisibleButtons / 2));
+            let end = start + this.attDetailsMaxVisibleButtons - 1;
+
+            if (end > this.attDetailsTotalPages) {
+                end = this.attDetailsTotalPages;
+                start = Math.max(1, end - this.attDetailsMaxVisibleButtons + 1);
             }
 
             const pages = [];

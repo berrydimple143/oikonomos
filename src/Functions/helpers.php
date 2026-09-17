@@ -19,12 +19,28 @@
             return $short_text;
         }
 
-        function getFullUrl() {
+        function getFullUrl($param) {
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $host = $_SERVER['HTTP_HOST'];
             $uri = $_SERVER['REQUEST_URI'];
             $full_url = $protocol . '://' . $host . $uri;
-            return str_replace("/admin/", "", $full_url);
+            $type = "/admin/";
+            if($param == "income") {
+                $type = "/admin/income/";
+            } elseif($param == "expense") {
+                $type = "/admin/expense/";
+            } elseif($param == "attendance") {
+                $type = "/admin/attendance/";
+            } elseif($param == "projection") {
+                $type = "/admin/projection/";
+            } elseif($param == "expense_form") {
+                $type = "/admin/expense_form/";
+            } elseif($param == "income_form") {
+                $type = "/admin/income_form/";
+            } elseif($param == "attendance_form") {
+                $type = "/admin/attendance_form/";
+            }
+            return str_replace($type, "", $full_url);
         }
 
         function convertDateToString($d, $fmt) {

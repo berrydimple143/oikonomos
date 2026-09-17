@@ -6,6 +6,30 @@
 
 	class User {
 
+		public static function updateCurrency($currency, $id) {
+			$pdo = Database::connect();
+			$updated_at = date('Y-m-d H:i:s');
+			$user = $pdo->prepare("UPDATE users SET currency=?, updated_at=? WHERE id=?");
+			$updated = $user->execute([$currency, $updated_at, $id]);	
+			if($updated) {
+				return self::getUser($id);
+			 } else {
+				return false;
+			 }
+		}
+
+		public static function changePassword($password, $id) {
+			$pdo = Database::connect();
+			$updated_at = date('Y-m-d H:i:s');
+			$user = $pdo->prepare("UPDATE users SET password=?, updated_at=? WHERE id=?");
+			$updated = $user->execute([password_hash($password, PASSWORD_DEFAULT), $updated_at, $id]);	
+			if($updated) {
+				return true;
+			 } else {
+				return false;
+			 }
+		}
+
 		public static function changeStatus($id, $status) {
 			$pdo = Database::connect();
 			$updated_at = date('Y-m-d H:i:s');
