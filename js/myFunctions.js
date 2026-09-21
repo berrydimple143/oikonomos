@@ -143,6 +143,17 @@ window.getFullMonthWord = function(month) {
 window.array_sum = function(numbers) {
     return numbers.reduce((total, num) => total + num, 0);
 };
+
+window.generateCode = function() {
+    return Math.floor(1000000 + Math.random() * 9000000);
+};
+
+window.isPasswordsEqual = function(np, rp) {
+    if(np != rp) {
+        return false;
+    }
+    return true;
+};
 // window.getDataByLabel = function(label, arrData) {
 //     if(label == "Income") {
 //         if(arrData.includes(",")) {

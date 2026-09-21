@@ -19,6 +19,25 @@
             return $short_text;
         }
 
+        function getQueryStrings() {
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'];
+            $uri = $_SERVER['REQUEST_URI'];
+            $full_url = $protocol . '://' . $host . $uri;
+            $queryString = parse_url($full_url, PHP_URL_QUERY);
+            parse_str($queryString, $params);
+            return $params;
+        }
+
+        function getOrigUrl() {
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'];
+            $uri = $_SERVER['REQUEST_URI'];
+            $url = $protocol . '://' . $host . $uri;
+            $newUrl = strtok($url, '?');
+            return str_replace("confirmation.php", "", $newUrl);            
+        }
+
         function getFullUrl($param) {
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $host = $_SERVER['HTTP_HOST'];
@@ -39,6 +58,8 @@
                 $type = "/admin/income_form/";
             } elseif($param == "attendance_form") {
                 $type = "/admin/attendance_form/";
+            } elseif($param == "confirmation") {
+                $type = "/register.php";
             }
             return str_replace($type, "", $full_url);
         }

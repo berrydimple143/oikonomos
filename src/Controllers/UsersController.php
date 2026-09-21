@@ -39,24 +39,40 @@
 			}
 		}
 
+		public function updatePlan($code) {
+			if($code) {
+				$updated = User::updatePlan($code);
+				if($updated) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+
 		public function store($data) {
 			$firstname = trim(htmlspecialchars($data['firstname']));
 			$lastname = trim(htmlspecialchars($data['lastname']));			
-			$email = trim(htmlspecialchars($data['email']));
+			$email = trim(htmlspecialchars($data['email']));			
 			$password = trim(htmlspecialchars($data['password']));		
 			$organization = trim(htmlspecialchars($data['organization']));	
+			$code = trim(htmlspecialchars($data['code']));
 
 			if($firstname AND $lastname AND $email AND $password) {
-				if(User::countUser($email) > 0) {
-					return 'exist';
+				if(User::findCode($code) > 0) {
+					return 'code exist';
 				} else {
-					$inserted = User::createUser($firstname, $lastname, $email, $password, $organization);
-					if($inserted) {
-						return $inserted;
+					if(User::countUser($email) > 0) {
+						return 'exist';
 					} else {
-						return false;
-					}
-				}				
+						$inserted = User::createUser($firstname, $lastname, $email, $password, $organization, $code);
+						if($inserted) {
+							return $inserted;
+						} else {
+							return false;
+						}
+					}				
+				}
 			}
 		}
 

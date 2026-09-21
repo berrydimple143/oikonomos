@@ -15,5 +15,7 @@
             "name": "Virgil Rosalita"
         }
     ],
-    "require": {}
+    "require": {
+        "phpmailer/phpmailer": "^7.1"
+    }
 }

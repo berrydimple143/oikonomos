@@ -167,26 +167,47 @@ document.addEventListener('alpine:init', () => {
             { id: 'IDR', symbol: '\u0052\u0070' }
         ],
         changePasswordModal: null,
+        passwordChangeSuccessful: null,
+        isSuccessful: false,
         old_password: null,
         new_password: null,
         retype_password: null,
+        isEyeOpen1: false,
+        isEyeOpen2: false,
+        isEyeOpen3: false,
         pageName: '',
         passwordError: '',
         hasPasswordError: false,
 
+        showPass1() {
+            this.isEyeOpen1 = true;
+            this.$refs.pass1.type = 'text';
+        },
+        showPass2() {
+            this.isEyeOpen2 = true;
+            this.$refs.pass2.type = 'text';
+        },
+        showPass3() {
+            this.isEyeOpen3 = true;
+            this.$refs.pass3.type = 'text';
+        },
+        hidePass1() {
+            this.isEyeOpen1 = false;
+            this.$refs.pass1.type = 'password';
+        },
+        hidePass2() {
+            this.isEyeOpen2 = false;
+            this.$refs.pass2.type = 'password';
+        },
+        hidePass3() {
+            this.isEyeOpen3 = false;
+            this.$refs.pass3.type = 'password';
+        },        
         changePassword() {
             this.changePasswordModal.classList.remove('hidden');
         },
-
-        isPasswordsEqual(np, rp) {
-            if(np != rp) {
-                return false;
-            }
-            return true;
-        },
-
         async submitPasswordChange() {
-            if(this.isPasswordsEqual(this.new_password, this.retype_password)) {
+            if(isPasswordsEqual(this.new_password, this.retype_password)) {
                 try {                               
                     let response = await fetch(this.userAPI, {
                         method: 'POST',
@@ -207,6 +228,12 @@ document.addEventListener('alpine:init', () => {
                         return;
                     } else {
                         this.changePasswordModal.classList.add('hidden');
+                        this.isSuccessful = true;
+                        this.passwordChangeSuccessful.classList.remove('hidden');         
+                        setTimeout(() => {
+                            this.isSuccessful = false;
+                            this.passwordChangeSuccessful.classList.add('hidden');
+                        }, 2000);
                     }
                 } catch (error) {
                     console.error("Error loading JSON data:", error);
@@ -216,7 +243,6 @@ document.addEventListener('alpine:init', () => {
                 this.showPasswordError("Password mismatch!", 1500);
             }            
         },
-
         showPasswordError(msg, sec) {
             this.passwordError = msg;
             this.hasPasswordError = true;
@@ -241,7 +267,11 @@ document.addEventListener('alpine:init', () => {
                 });
                 const res = await response.json();        
                 if(res.status) {
-                    this.currency = res.data.currency;
+                    if(!res.data.currency) {
+                        this.currency = "PHP";
+                    } else {                        
+                        this.currency = res.data.currency;
+                    }                    
                 }
             } catch (error) {
                 console.error("Error loading JSON data:", error);
@@ -1180,6 +1210,7 @@ document.addEventListener('alpine:init', () => {
         },
         updateTotal(tp) {
             let sumOfNumber = 0;
+            console.log(this.currency);
             if(tp == 'income') {
                 const arrayOfAmount = this.incomes.map(inc => (sumOfNumber += parseFloat(inc.amount)));  
                 this.incomeTotal = currencyFormatter(sumOfNumber, this.currency);
@@ -1252,7 +1283,8 @@ document.addEventListener('alpine:init', () => {
             this.viewIncomeDetails = document.getElementById('viewIncomeDetails');
             this.viewExpenseDetails = document.getElementById('viewExpenseDetails'); 
             this.viewAttendanceDetails = document.getElementById('viewAttendanceDetails');
-            this.changePasswordModal = document.getElementById('changePasswordModal');            
+            this.changePasswordModal = document.getElementById('changePasswordModal');
+            this.passwordChangeSuccessful = document.getElementById('passwordChangeSuccessful');            
         },
         // initChart() {
         //     let grossIncome = this.grossNumber;

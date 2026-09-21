@@ -3,8 +3,25 @@
 
 	use App\Core\Database;
 	use PDO;
+	use DateTimeImmutable;
+	use DateInterval;
 
 	class User {
+
+		public static function updatePlan($code) {
+			$pdo = Database::connect();
+			$dt = date('Y-m-d H:i:s');
+			$date = new DateTimeImmutable($dt);
+    		$new_date = $date->add(new DateInterval('P1W'));
+    		$expiry_date = $new_date->format('Y-m-d H:i:s'); 
+			$user = $pdo->prepare("UPDATE users SET starting_date=?, expiry_date=?, updated_at=? WHERE code=?");
+			$updated = $user->execute([$dt, $expiry_date, $dt, $code]);	
+			if($updated) {
+				return true;
+			 } else {
+				return false;
+			 }
+		}
 
 		public static function updateCurrency($currency, $id) {
 			$pdo = Database::connect();
@@ -43,6 +60,12 @@
 			return $type->execute([$classification, $id]);
 		}
 
+		public static function findCode($code) {
+			$pdo = Database::connect();			
+			$user = $pdo->query("SELECT COUNT(*) FROM users WHERE code = '$code'");
+			return $user->fetchColumn();
+		}
+
 		public static function countUser($email) {
 			$pdo = Database::connect();			
 			$user = $pdo->query("SELECT COUNT(*) FROM users WHERE email = '$email'");
@@ -73,9 +96,9 @@
 			return $user->fetch(PDO::FETCH_ASSOC);
 		}
 
-		public static function createUser($firstname, $lastname, $email, $password, $organization) {
+		public static function createUser($firstname, $lastname, $email, $password, $organization, $code) {
 			$pdo = Database::connect();
-			$user = $pdo->prepare("INSERT INTO users(firstname, lastname, email, password, organization, created_at, updated_at) VALUES(:firstname, :lastname, :email, :password, :organization, :created_at, :updated_at)");
+			$user = $pdo->prepare("INSERT INTO users(firstname, lastname, email, password, organization, code, role, status, created_at, updated_at) VALUES(:firstname, :lastname, :email, :password, :organization, :code, :role, :status, :created_at, :updated_at)");
 			$dt = date('Y-m-d H:i:s');
 			return $user->execute([
 				":firstname" =>$firstname,
@@ -83,6 +106,9 @@
 				":email" => $email,
 				":password" => password_hash($password, PASSWORD_DEFAULT),
 				":organization" => $organization,
+				":code" => $code,
+				":role" => 'member',
+				":status" => 0,
 				":created_at" => $dt,
 				":updated_at" => $dt
 			]);

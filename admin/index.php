@@ -18,14 +18,15 @@
         <script src="<?= $url; ?>/js/tailwindcss.cdn.js"></script>
         <script type="module" src="<?= $url; ?>/js/main.js"></script>       
         <script src="<?= $url; ?>/js/myFunctions.js"></script>
-        <script src="<?= $url; ?>/js/chart.min.js"></script>
+        <!-- <script src="<?= $url; ?>/js/chart.min.js"></script> -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-         <script src="<?= $url; ?>/js/chartjs-plugin-datalabels.min.js"></script>
+         <!-- <script src="<?= $url; ?>/js/chartjs-plugin-datalabels.min.js"></script> -->
          <style>
             [x-cloak] { display: none !important; }
         </style>
   </head>
   <body x-data="dashboardLoad">
+    <?php include('../includes/admin/modals/passwordChangeSuccessful.php'); ?>
     <?php include('../includes/admin/modals/changePassword.php'); ?>
     <?php include('../includes/admin/modals/loadingModal.php'); ?>
     <?php include('../includes/admin/modals/viewIncomeDetails.php'); ?>

@@ -26,6 +26,7 @@
                             type="password" 
                             x-model="old_password"  
                             id="old_password"  
+                            x-ref="pass1" 
                             name="old_password"  
                             autocomplete="old_password"  
                             placeholder="Type your current password here ..."                           
@@ -33,9 +34,16 @@
                         <button
                             id="old-button"             
                             type="button"  
+                            @mouseenter.prevent="showPass1" 
+                            @mouseleave.prevent="hidePass1" 
                             class="absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 bg-transparent px-[3px] py-[1.5px] text-xs -tracking-[0.2px] text-white dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
                         >
-                            <?php includeWithArgs('../images/icons/eye.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            <span x-show="!isEyeOpen1">
+                                <?php includeWithArgs('../images/icons/eye.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            </span>
+                            <span x-show="isEyeOpen1">
+                                <?php includeWithArgs('../images/icons/eye-open.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            </span>
                         </button>
                     </div>  
                 </div>
@@ -46,6 +54,7 @@
                             type="password" 
                             x-model="new_password"  
                             id="new_password"  
+                            x-ref="pass2"
                             name="new_password"  
                             autocomplete="new_password"  
                             placeholder="Type your new password here ..."                           
@@ -53,29 +62,44 @@
                         <button
                             id="new-button"        
                             type="button"      
+                            @mouseenter.prevent="showPass2" 
+                            @mouseleave.prevent="hidePass2"
                             class="absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 bg-transparent px-[3px] py-[1.5px] text-xs -tracking-[0.2px] text-white dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
                         >
-                            <?php includeWithArgs('../images/icons/eye.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            <span x-show="!isEyeOpen2">
+                                <?php includeWithArgs('../images/icons/eye.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            </span>
+                            <span x-show="isEyeOpen2">
+                                <?php includeWithArgs('../images/icons/eye-open.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            </span>
                         </button>
                     </div>  
                 </div>                
                 <div>
-                    <label for="retype_password" class="block text-sm font-semibold text-gray-400 mb-1 pl-1">Re-type New Password <span class="text-xs italic">(<span class="text-red-600">*</span>)</span></label>
+                    <label for="retype_password" class="block text-sm font-semibold text-gray-400 mb-1 pl-1">Confirm New Password <span class="text-xs italic">(<span class="text-red-600">*</span>)</span></label>
                     <div class="relative w-full">                        
                         <input
                             type="password" 
                             x-model="retype_password"  
                             id="retype_password"  
+                            x-ref="pass3"
                             name="retype_password"  
                             autocomplete="retype_password"  
-                            placeholder="Re-type your new password here ..."                           
+                            placeholder="Confirm your new password here ..."                           
                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-100 focus:ring-brand-200/10 dark:focus:border-brand-400 h-10 w-full rounded-lg border border-gray-200 bg-transparent py-1.5 pr-14 pl-3 text-xs text-white placeholder:text-white focus:ring-1 focus:outline-hidden lg:w-full dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30" required="true"/>
                         <button
                             id="retype-button"          
                             type="button"    
+                            @mouseenter.prevent="showPass3" 
+                            @mouseleave.prevent="hidePass3"
                             class="absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 bg-transparent px-[3px] py-[1.5px] text-xs -tracking-[0.2px] text-white dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
                         >
-                            <?php includeWithArgs('../images/icons/eye.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            <span x-show="!isEyeOpen3">
+                                <?php includeWithArgs('../images/icons/eye.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            </span>
+                            <span x-show="isEyeOpen3">
+                                <?php includeWithArgs('../images/icons/eye-open.php', ['color' => '#fff', 'class' => 'w-6 h-6', 'view' => '0 0 24 24']); ?>
+                            </span>
                         </button>
                     </div>  
                 </div>                
